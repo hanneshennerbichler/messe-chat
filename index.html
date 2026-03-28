@@ -16,28 +16,27 @@
     }
 
     #mic {
-  background: #f2f2f7;
-  border: 1px solid rgba(0,0,0,0.1);
-  border-radius: 10px;
-  width: 34px;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: all 0.15s ease;
-  color: #1c1c1e;
-}
+      background: #f2f2f7;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 10px;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+      color: #1c1c1e;
+    }
+    #mic:hover { background: #e5e5ea; }
+    #mic.recording { background: #ff3b30; border-color: #ff3b30; color: white; animation: pulse-mic 1s infinite; }
 
-#mic:hover { background: #e5e5ea; }
-#mic.recording { background: #ff3b30; border-color: #ff3b30; color: white; animation: pulse-mic 1s infinite; }
-
-@keyframes pulse-mic {
-  0% { box-shadow: 0 0 0 0 rgba(255,59,48,0.4); }
-  70% { box-shadow: 0 0 0 8px rgba(255,59,48,0); }
-  100% { box-shadow: 0 0 0 0 rgba(255,59,48,0); }
-}
+    @keyframes pulse-mic {
+      0% { box-shadow: 0 0 0 0 rgba(255,59,48,0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(255,59,48,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,59,48,0); }
+    }
 
     nav {
       background: rgba(255,255,255,0.85);
@@ -61,6 +60,8 @@
       color: #1c1c1e;
     }
 
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+
     .nav-badge {
       font-size: 12px;
       font-weight: 500;
@@ -70,6 +71,22 @@
       border-radius: 20px;
       padding: 4px 12px;
     }
+
+    .nav-map-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #1c1c1e;
+      background: #f2f2f7;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 20px;
+      padding: 5px 14px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .nav-map-btn:hover { background: #e5e5ea; }
 
     #chat {
       flex: 1;
@@ -168,6 +185,25 @@
       color: #aeaeb2;
       font-style: italic;
     }
+
+    /* Map action button below assistant messages */
+    .map-action {
+      align-self: flex-start;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #1D4ED8;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: -4px;
+    }
+    .map-action:hover { background: #DBEAFE; }
 
     .suggestions-area {
       max-width: 760px;
@@ -270,13 +306,115 @@
 
     #send:hover { background: #3a3a3c; }
     #send:disabled { background: #d1d1d6; cursor: not-allowed; }
+
+    /* ── MAP MODAL ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+      width: 100%;
+      max-width: 620px;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: scale(0.96) translateY(8px);
+      transition: transform 0.2s ease;
+    }
+    .modal-overlay.open .modal {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 24px 16px;
+      border-bottom: 1px solid rgba(0,0,0,0.07);
+    }
+    .modal-header h3 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+    .modal-close {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #f2f2f7;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: #636366;
+      transition: background 0.15s;
+    }
+    .modal-close:hover { background: #e5e5ea; }
+
+    .map-body { padding: 20px 24px 24px; }
+
+    .map-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: #636366;
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .map-hint {
+      font-size: 12px;
+      color: #aeaeb2;
+      margin-top: 14px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
 
 <nav>
   <span class="nav-title">Messe Chat</span>
-  <span class="nav-badge">HANNOVER MESSE 2026</span>
+  <div class="nav-right">
+    <span class="nav-badge">HANNOVER MESSE 2026</span>
+    <button class="nav-map-btn" onclick="openMapModal([])">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21 3 6"/>
+        <line x1="9" y1="3" x2="9" y2="18"/>
+        <line x1="15" y1="6" x2="15" y2="21"/>
+      </svg>
+      Hallenplan
+    </button>
+  </div>
 </nav>
 
 <div id="chat">
@@ -324,97 +462,159 @@
       </div>
 </div>
 
+<!-- ── MAP MODAL ── -->
+<div class="modal-overlay" id="map-overlay" onclick="if(event.target.id==='map-overlay')closeMap()">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Hallenplan · HANNOVER MESSE 2026</h3>
+      <button class="modal-close" onclick="closeMap()">✕</button>
+    </div>
+    <div class="map-body">
+      <div class="map-legend" id="map-legend"></div>
+      <div id="map-svg-wrap"></div>
+      <p class="map-hint" id="map-hint">Klicke auf „Auf Karte zeigen" nach einer Suche, um relevante Hallen hervorzuheben</p>
+    </div>
+  </div>
+</div>
+
 <script>
+  const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? ''
+    : 'https://messe-chat-production.up.railway.app';
+
+  // ── HALL MAP DATA ─────────────────────────────────────────────────────────
+  const HALLS = [
+    { id: 11, x: 20,  y: 80,  w: 115, h: 72, topic: 'Automation & Robotics',  color: '#007AFF' },
+    { id: 12, x: 148, y: 80,  w: 115, h: 72, topic: 'Automation & Robotics',  color: '#007AFF' },
+    { id: 13, x: 276, y: 80,  w: 115, h: 72, topic: 'IIoT & Startups',        color: '#5856D6' },
+    { id: 14, x: 20,  y: 168, w: 115, h: 72, topic: 'IIoT & Cloud',           color: '#5856D6' },
+    { id: 15, x: 148, y: 168, w: 115, h: 72, topic: 'Cloud & Security',       color: '#5856D6' },
+    { id: 16, x: 276, y: 168, w: 115, h: 72, topic: 'AI & Digital',           color: '#AF52DE' },
+    { id: 17, x: 420, y: 80,  w: 115, h: 160, topic: 'Energie & Wasserstoff', color: '#FF9500' },
+    { id: 23, x: 20,  y: 270, w: 243, h: 72, topic: 'Forschung & Innovation', color: '#34C759' },
+    { id: 25, x: 20,  y: 368, w: 115, h: 72, topic: 'Industriekomponenten',   color: '#00C7BE' },
+    { id: 26, x: 148, y: 368, w: 115, h: 72, topic: 'Supply Chain',           color: '#00C7BE' },
+    { id: 27, x: 276, y: 368, w: 115, h: 72, topic: 'Komponenten & 3D-Druck', color: '#00C7BE' },
+  ];
+
+  function buildMapSVG(highlightHalls) {
+    const hl = new Set((highlightHalls || []).map(Number));
+    const dimAll = hl.size > 0;
+
+    let inner = '';
+    for (const h of HALLS) {
+      const active = !dimAll || hl.has(h.id);
+      const fill   = active ? h.color + '20' : '#f0f0f5';
+      const stroke = active ? h.color        : '#d1d1d6';
+      const sw     = active ? 2              : 1;
+      const numCol = active ? '#1c1c1e'      : '#c7c7cc';
+      const txtCol = active ? h.color        : '#c7c7cc';
+
+      // Wrap topic at '&'
+      const parts = h.topic.split(' & ');
+      const topicY0 = h.y + 44;
+
+      inner += `<g>
+        <rect x="${h.x}" y="${h.y}" width="${h.w}" height="${h.h}" rx="10"
+          fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>
+        <text x="${h.x + h.w/2}" y="${h.y + 24}" text-anchor="middle"
+          font-family="system-ui,sans-serif" font-size="14" font-weight="700" fill="${numCol}">${h.id}</text>`;
+      parts.forEach((part, i) => {
+        inner += `<text x="${h.x + h.w/2}" y="${topicY0 + i*13}" text-anchor="middle"
+          font-family="system-ui,sans-serif" font-size="10" fill="${txtCol}">${part}</text>`;
+      });
+      inner += `</g>`;
+    }
+
+    return `<svg viewBox="0 0 555 460" width="100%" style="display:block;max-height:390px">
+      <text x="277" y="22" text-anchor="middle" font-family="system-ui,sans-serif"
+        font-size="11" fill="#aeaeb2" font-weight="600">↑ NORD-EINGANG</text>
+      <text x="277" y="452" text-anchor="middle" font-family="system-ui,sans-serif"
+        font-size="11" fill="#aeaeb2" font-weight="600">↓ SÜDEN</text>
+      ${inner}
+    </svg>`;
+  }
+
+  function buildLegend(highlightHalls) {
+    const hl = new Set((highlightHalls || []).map(Number));
+    const seen = new Set();
+    return HALLS
+      .filter(h => { if (seen.has(h.color)) return false; seen.add(h.color); return true; })
+      .map(h => {
+        const active = hl.size === 0 || [...hl].some(id => HALLS.find(x => x.id === id)?.color === h.color);
+        return `<span class="legend-item" style="opacity:${active ? 1 : 0.35}">
+          <span class="legend-dot" style="background:${h.color}"></span>${h.topic}
+        </span>`;
+      }).join('');
+  }
+
+  function openMapModal(halls) {
+    document.getElementById('map-svg-wrap').innerHTML = buildMapSVG(halls);
+    document.getElementById('map-legend').innerHTML = buildLegend(halls);
+    document.getElementById('map-hint').style.display = halls.length > 0 ? 'none' : 'block';
+    document.getElementById('map-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMap() {
+    document.getElementById('map-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMap(); });
+
+  // ── CHAT ─────────────────────────────────────────────────────────────────
   let history = [];
-
   let recognition = null;
-let isRecording = false;
+  let isRecording = false;
 
-function toggleMic() {
-  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-    alert('Speech recognition is not supported in this browser. Please use Chrome.');
-    return;
-  }
+  async function sendMessage() {
+    const input = document.getElementById('input');
+    const text = input.value.trim();
+    if (!text) return;
 
-  if (isRecording) {
-    recognition.stop();
-    return;
-  }
+    addMessage(text, 'user');
+    input.value = '';
+    history.push({ role: 'user', content: text });
 
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  recognition = new SpeechRecognition();
-  recognition.lang = 'en-US';
-  recognition.continuous = false;
-  recognition.interimResults = true;
+    const loadingEl = addMessage('Thinking...', 'assistant loading');
+    document.getElementById('send').disabled = true;
 
-  recognition.onstart = () => {
-    isRecording = true;
-    document.getElementById('mic').classList.add('recording');
-  };
+    try {
+      const response = await fetch(API_BASE + '/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, history: history.slice(0, -1) })
+      });
 
-  recognition.onresult = (event) => {
-    const transcript = Array.from(event.results)
-      .map(r => r[0].transcript)
-      .join('');
-    document.getElementById('input').value = transcript;
-  };
+      const data = await response.json();
+      const reply = data.reply;
+      const exhibitors = data.exhibitors || [];
 
-  recognition.onend = () => {
-    isRecording = false;
-    document.getElementById('mic').classList.remove('recording');
-    const text = document.getElementById('input').value.trim();
-    if (text) sendMessage();
-  };
+      if (reply) {
+        loadingEl.textContent = reply;
+        loadingEl.classList.remove('loading');
+        history.push({ role: 'assistant', content: reply });
 
-  recognition.onerror = (event) => {
-    isRecording = false;
-    document.getElementById('mic').classList.remove('recording');
-    console.error('Speech error:', event.error);
-  };
+        // Show map button if specific halls were found
+        const halls = [...new Set(exhibitors.map(e => e.hall).filter(Boolean))];
+        if (halls.length > 0) {
+          addMapButton(halls);
+        }
+      } else {
+        loadingEl.textContent = 'No response received.';
+        loadingEl.classList.remove('loading');
+        history.pop();
+      }
 
-  recognition.start();
-}
-
-async function sendMessage() {
-  const input = document.getElementById('input');
-  const text = input.value.trim();
-  if (!text) return;
-
-  addMessage(text, 'user');
-  input.value = '';
-  history.push({ role: 'user', content: text });
-
-  const loadingEl = addMessage('Thinking...', 'assistant loading');
-  document.getElementById('send').disabled = true;
-
-  try {
-    const response = await fetch('https://messe-chat-production.up.railway.app/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text, history: history.slice(0, -1) })
-    });
-
-    const data = await response.json();
-    const reply = data.reply;
-
-    if (reply) {
-      loadingEl.textContent = reply;
-      loadingEl.classList.remove('loading');
-      history.push({ role: 'assistant', content: reply });
-    } else {
-      loadingEl.textContent = 'No response received.';
+    } catch (err) {
+      loadingEl.textContent = 'Error connecting to server.';
       loadingEl.classList.remove('loading');
       history.pop();
     }
 
-  } catch (err) {
-    loadingEl.textContent = 'Error connecting to server.';
-    loadingEl.classList.remove('loading');
-    history.pop();
+    document.getElementById('send').disabled = false;
   }
-
-  document.getElementById('send').disabled = false;
-}
 
   function addMessage(text, cls) {
     const chat = document.getElementById('chat');
@@ -426,9 +626,66 @@ async function sendMessage() {
     return el;
   }
 
+  function addMapButton(halls) {
+    const chat = document.getElementById('chat');
+    const btn = document.createElement('button');
+    btn.className = 'map-action';
+    const hallLabel = halls.length === 1 ? `Halle ${halls[0]}` : `Hallen ${halls.join(', ')}`;
+    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21 3 6"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg> ${hallLabel} auf Karte zeigen`;
+    btn.onclick = () => openMapModal(halls);
+    chat.appendChild(btn);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
   function ask(question) {
     document.getElementById('input').value = question;
     sendMessage();
+  }
+
+  // ── VOICE ─────────────────────────────────────────────────────────────────
+  function toggleMic() {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('Speech recognition is not supported in this browser. Please use Chrome.');
+      return;
+    }
+
+    if (isRecording) {
+      recognition.stop();
+      return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    recognition.onstart = () => {
+      isRecording = true;
+      document.getElementById('mic').classList.add('recording');
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = Array.from(event.results)
+        .map(r => r[0].transcript)
+        .join('');
+      document.getElementById('input').value = transcript;
+    };
+
+    recognition.onend = () => {
+      isRecording = false;
+      document.getElementById('mic').classList.remove('recording');
+      const text = document.getElementById('input').value.trim();
+      if (text) sendMessage();
+    };
+
+    recognition.onerror = (event) => {
+      isRecording = false;
+      document.getElementById('mic').classList.remove('recording');
+      console.error('Speech error:', event.error);
+    };
+
+    recognition.start();
   }
 </script>
 
