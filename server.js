@@ -13,6 +13,13 @@ app.use(express.static('.'));
 const exhibitors = JSON.parse(fs.readFileSync('exhibitors.json', 'utf8'));
 console.log(`Loaded ${exhibitors.length} exhibitors from JSON`);
 
+// Extract hall number from booth string, e.g. "Hall 17, Stand F60" → 17
+function getHall(booth) {
+  if (!booth) return null;
+  const m = booth.match(/Hall\s+(\d+)/i);
+  return m ? parseInt(m[1]) : null;
+}
+
 function searchExhibitors(query) {
   const cleaned = query.toLowerCase()
     .replace(/where is|where can i find|find me|show me|tell me about|looking for|i want to visit|i want to find|stand of|booth of|what is the difference between|difference between|tell me more about|more about/g, '')
@@ -32,7 +39,7 @@ function searchExhibitors(query) {
         (e.booth && e.booth.toLowerCase().includes(word))
       ) {
         seen.add(e.id);
-        results.push(e);
+        results.push({ ...e, hall: getHall(e.booth) });
       }
     }
   }
@@ -55,7 +62,7 @@ function searchByHistory(history) {
         if (seen.has(e.id)) continue;
         if (e.name && e.name.toLowerCase().includes(word)) {
           seen.add(e.id);
-          results.push(e);
+          results.push({ ...e, hall: getHall(e.booth) });
         }
       }
     }
@@ -148,7 +155,10 @@ ABSOLUTE RULES:
       }
     });
 
-    res.json({ reply: response.data.choices[0].message.content });
+    res.json({
+      reply: response.data.choices[0].message.content,
+      exhibitors: found,
+    });
   } catch (err) {
     console.error(err.response?.data || err.message);
     res.status(500).json({ error: 'Something went wrong' });
