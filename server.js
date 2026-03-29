@@ -250,11 +250,16 @@ async function pollInbox() {
   }
 }
 
-// Start polling after 5s delay, then every 60s
-setTimeout(() => {
-  pollInbox();
-  setInterval(pollInbox, 60 * 1000);
-}, 5000);
+// IMAP polling only runs when SMTP is fully configured (i.e. locally, not on Railway)
+if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+  setTimeout(() => {
+    pollInbox();
+    setInterval(pollInbox, 60 * 1000);
+  }, 5000);
+  console.log('[IMAP] Poller enabled — checking inbox every 60s');
+} else {
+  console.log('[IMAP] Poller disabled — SMTP not configured');
+}
 
 // ---------------------------------------------------------------------------
 // GET /exhibitors
