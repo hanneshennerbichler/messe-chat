@@ -80,14 +80,43 @@ function generateEmailDraft(booking) {
 }
 
 // ---------------------------------------------------------------------------
-// AI reply classifier
-// Uses local OpenAI key if available, otherwise proxies to Railway backend.
+// Keyword-based fallback classifier (no API key needed)
+// ---------------------------------------------------------------------------
+function classifyByKeywords(replyText) {
+  const t = replyText.toLowerCase();
+
+  const confirmed = [
+    'yes', 'confirmed', 'confirm', 'agreed', 'great', 'perfect', 'works for me',
+    'looking forward', 'see you', 'we will be there', 'sounds good', 'happy to meet',
+    'ja', 'passt', 'gerne', 'einverstanden', 'bestätigt', 'bestätige', 'freue mich',
+    'klingt gut', 'wunderbar', 'prima', 'bis dann', 'wir sehen uns', 'geht klar',
+    'natürlich', 'selbstverständlich', 'sehr gerne',
+  ];
+  const declined = [
+    'no', 'sorry', 'unfortunately', 'unavailable', 'cannot', "can't", 'not possible',
+    'decline', 'declined', 'busy', 'full schedule', 'no availability',
+    'nein', 'leider', 'nicht möglich', 'kein termin', 'keine zeit', 'abgesagt',
+    'absage', 'nicht verfügbar', 'bedauerlicherweise', 'tut mir leid',
+  ];
+
+  const cScore = confirmed.filter(w => t.includes(w)).length;
+  const dScore = declined.filter(w => t.includes(w)).length;
+
+  if (cScore > dScore && cScore > 0) {
+    return { status: 'confirmed', summary: 'Der Aussteller hat den Termin bestätigt.' };
+  }
+  if (dScore > cScore && dScore > 0) {
+    return { status: 'declined', summary: 'Der Aussteller hat den Termin abgelehnt.' };
+  }
+  return { status: 'uncertain', summary: 'Die Antwort konnte nicht eindeutig klassifiziert werden.' };
+}
+
+// ---------------------------------------------------------------------------
+// AI reply classifier — tries OpenAI, falls back to keyword matching
 // ---------------------------------------------------------------------------
 async function classifyReply(booking, replyText) {
-  const prompt = `Original meeting request was for: ${booking.exhibitor.name}, ${booking.exhibitor.booth || ''}.\n\nReply received:\n\n${replyText}`;
-
-  // Try local OpenAI key first
-  if (process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('your-key')) {
+  // Try OpenAI if key looks valid
+  if (process.env.OPENAI_API_KEY) {
     try {
       const completion = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
@@ -99,27 +128,24 @@ async function classifyReply(booking, replyText) {
               'Classify the reply and respond with JSON only — no markdown. ' +
               'Schema: {"status": "confirmed" | "declined" | "uncertain", "summary": "<one concise sentence in German describing the outcome>"}'
           },
-          { role: 'user', content: prompt }
+          {
+            role: 'user',
+            content: `Original meeting request was for: ${booking.exhibitor.name}, ${booking.exhibitor.booth || ''}.\n\nReply received:\n\n${replyText}`
+          }
         ],
         response_format: { type: 'json_object' },
         temperature: 0,
       });
       return JSON.parse(completion.choices[0].message.content);
     } catch (err) {
-      if (!err.message.includes('401')) throw err;
-      console.warn('[IMAP] Local OpenAI key invalid, falling back to Railway…');
+      console.warn(`[IMAP] OpenAI unavailable (${err.message.slice(0, 60)}), using keyword classifier.`);
     }
   }
 
-  // Fallback: proxy to Railway backend
-  const RAILWAY = 'https://messe-chat-production.up.railway.app';
-  const res = await fetch(`${RAILWAY}/classify-reply`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ booking, replyText }),
-  });
-  if (!res.ok) throw new Error(`Railway classify-reply: ${res.status}`);
-  return res.json();
+  // Fallback: keyword-based classification (no API needed)
+  const result = classifyByKeywords(replyText);
+  console.log(`[IMAP] Keyword classification: ${result.status}`);
+  return result;
 }
 
 // ---------------------------------------------------------------------------
