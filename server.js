@@ -1,160 +1,438 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const axios = require('axios');
 const fs = require('fs');
+const path = require('path');
+const nodemailer = require('nodemailer');
+const { ImapFlow } = require('imapflow');
+const OpenAI = require('openai');
+const { submitContactForm, buildContactUrl } = require('./contactAgent');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static('.'));
+app.use(express.static(__dirname));
 
-// Load exhibitors from JSON file
-const exhibitors = JSON.parse(fs.readFileSync('exhibitors.json', 'utf8'));
-console.log(`Loaded ${exhibitors.length} exhibitors from JSON`);
+const PORT = process.env.PORT || 3001;
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-function searchExhibitors(query) {
-  const cleaned = query.toLowerCase()
-    .replace(/where is|where can i find|find me|show me|tell me about|looking for|i want to visit|i want to find|stand of|booth of|what is the difference between|difference between|tell me more about|more about/g, '')
-    .trim();
+// ---------------------------------------------------------------------------
+// Exhibitors data
+// ---------------------------------------------------------------------------
+let exhibitors = [];
+try {
+  exhibitors = JSON.parse(fs.readFileSync(path.join(__dirname, 'exhibitors.json'), 'utf8'));
+  console.log(`[Server] Loaded ${exhibitors.length} exhibitors.`);
+} catch (e) {
+  console.error('[Server] Could not load exhibitors.json:', e.message);
+}
 
-  const words = cleaned.split(' ').filter(w => w.length > 1);
-  const results = [];
-  const seen = new Set();
+// ---------------------------------------------------------------------------
+// Bookings persistence
+// ---------------------------------------------------------------------------
+const BOOKINGS_FILE = path.join(__dirname, 'bookings.json');
 
-  for (const word of words) {
-    for (const e of exhibitors) {
-      if (seen.has(e.id)) continue;
-      if (
-        (e.name && e.name.toLowerCase().includes(word)) ||
-        (e.country && e.country.toLowerCase().includes(word)) ||
-        (e.city && e.city.toLowerCase().includes(word)) ||
-        (e.booth && e.booth.toLowerCase().includes(word))
-      ) {
-        seen.add(e.id);
-        results.push(e);
-      }
+function loadBookings() {
+  try {
+    if (fs.existsSync(BOOKINGS_FILE))
+      return JSON.parse(fs.readFileSync(BOOKINGS_FILE, 'utf8'));
+  } catch (e) {}
+  return [];
+}
+
+function saveBookings(bookings) {
+  fs.writeFileSync(BOOKINGS_FILE, JSON.stringify(bookings, null, 2));
+}
+
+// ---------------------------------------------------------------------------
+// Email draft generator
+// Booking ID is embedded in the subject so replies can be auto-matched.
+// ---------------------------------------------------------------------------
+function generateEmailDraft(booking) {
+  const { exhibitor, visitor } = booking;
+
+  const dateStr = visitor.preferredDate
+    ? new Date(visitor.preferredDate).toLocaleDateString('de-DE', {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+      })
+    : null;
+  const timeStr = visitor.preferredTime || null;
+
+  // Booking ID in subject → used for reply matching
+  const subject = `Meeting request at HANNOVER MESSE 2026 – ${visitor.company || visitor.name} [${booking.id}]`;
+
+  const body = [
+    `Dear ${exhibitor.name} team,`,
+    ``,
+    `My name is ${visitor.name}${visitor.company ? `, representing ${visitor.company}` : ''}. I am visiting HANNOVER MESSE 2026 (April 20–24, Hannover) and would very much like to schedule a meeting at your booth${exhibitor.booth ? ` (${exhibitor.booth})` : ''}.`,
+    dateStr ? `\nMy preferred time would be ${dateStr}${timeStr ? ` at ${timeStr}` : ''}.` : '',
+    visitor.message ? `\nTopics I'd like to discuss:\n${visitor.message}` : '',
+    ``,
+    `Please let me know if this works for you, or suggest an alternative time that suits your schedule.`,
+    ``,
+    `Best regards,`,
+    visitor.name,
+    visitor.company || '',
+    visitor.email,
+  ].filter(l => l !== null).join('\n').replace(/\n{3,}/g, '\n\n').trim();
+
+  return { subject, body };
+}
+
+// ---------------------------------------------------------------------------
+// AI reply classifier
+// Uses local OpenAI key if available, otherwise proxies to Railway backend.
+// ---------------------------------------------------------------------------
+async function classifyReply(booking, replyText) {
+  const prompt = `Original meeting request was for: ${booking.exhibitor.name}, ${booking.exhibitor.booth || ''}.\n\nReply received:\n\n${replyText}`;
+
+  // Try local OpenAI key first
+  if (process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('your-key')) {
+    try {
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You analyze email replies to trade fair meeting requests. ' +
+              'Classify the reply and respond with JSON only — no markdown. ' +
+              'Schema: {"status": "confirmed" | "declined" | "uncertain", "summary": "<one concise sentence in German describing the outcome>"}'
+          },
+          { role: 'user', content: prompt }
+        ],
+        response_format: { type: 'json_object' },
+        temperature: 0,
+      });
+      return JSON.parse(completion.choices[0].message.content);
+    } catch (err) {
+      if (!err.message.includes('401')) throw err;
+      console.warn('[IMAP] Local OpenAI key invalid, falling back to Railway…');
     }
   }
 
-  console.log(`Search: "${cleaned}" → ${results.length} results`);
-  return results.slice(0, 20);
+  // Fallback: proxy to Railway backend
+  const RAILWAY = 'https://messe-chat-production.up.railway.app';
+  const res = await fetch(`${RAILWAY}/classify-reply`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ booking, replyText }),
+  });
+  if (!res.ok) throw new Error(`Railway classify-reply: ${res.status}`);
+  return res.json();
 }
 
-function searchByHistory(history) {
-  if (!history || history.length === 0) return [];
-  const results = [];
-  const seen = new Set();
-
-  for (let i = history.length - 1; i >= 0; i--) {
-    const msg = history[i].content.toLowerCase();
-    const words = msg.split(' ').filter(w => w.length > 3 && !['find', 'show', 'tell', 'what', 'where', 'which', 'that', 'this', 'they', 'them', 'those', 'these', 'have', 'with', 'from', 'your', 'their', 'about', 'more', 'also', 'hall', 'stand', 'messe', 'hannover', 'difference', 'between'].includes(w));
-
-    for (const word of words) {
-      for (const e of exhibitors) {
-        if (seen.has(e.id)) continue;
-        if (e.name && e.name.toLowerCase().includes(word)) {
-          seen.add(e.id);
-          results.push(e);
-        }
-      }
+// ---------------------------------------------------------------------------
+// Decode quoted-printable encoding, then decode as UTF-8 (handles ä, ö, ü …)
+// ---------------------------------------------------------------------------
+function decodeQuotedPrintable(str) {
+  // First remove soft line breaks
+  const withoutSoft = str.replace(/=\r?\n/g, '');
+  // Collect bytes, decode as UTF-8 buffer
+  const bytes = [];
+  let i = 0;
+  while (i < withoutSoft.length) {
+    if (withoutSoft[i] === '=' && i + 2 < withoutSoft.length) {
+      bytes.push(parseInt(withoutSoft.slice(i + 1, i + 3), 16));
+      i += 3;
+    } else {
+      bytes.push(withoutSoft.charCodeAt(i));
+      i++;
     }
-
-    if (results.length > 0) break;
   }
-
-  return results.slice(0, 20);
+  return Buffer.from(bytes).toString('utf8');
 }
 
-app.post('/chat', async (req, res) => {
-  const { message, history } = req.body;
-  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+// ---------------------------------------------------------------------------
+// Extract plain-text body from a raw MIME email.
+// Handles multipart and quoted-printable encoding.
+// Strips the quoted original message (lines starting with ">").
+// ---------------------------------------------------------------------------
+function extractPlainText(raw) {
+  const text = raw.toString();
 
-  let found = searchExhibitors(message);
-  if (found.length === 0) {
-    found = searchByHistory(history);
-  }
+  // Find text/plain part in multipart email
+  const plainMatch = text.match(
+    /Content-Type:\s*text\/plain[^\r\n]*\r?\nContent-Transfer-Encoding:\s*quoted-printable\r?\n\r?\n([\s\S]*?)(?:\r?\n--|\r?\n\r?\nContent-Type:|$)/i
+  );
 
-  let exhibitorContext = '';
-  if (found.length > 0) {
-    exhibitorContext = '\n\n###DATABASE RESULTS (YOU MUST USE THIS DATA)###\n' +
-      found.map(e =>
-        `- ${e.name} | ${e.country}${e.city ? ', ' + e.city : ''} | ${e.booth} | ${e.url}`
-      ).join('\n') +
-      '\n###END OF DATABASE RESULTS###';
+  let body = '';
+  if (plainMatch) {
+    body = decodeQuotedPrintable(plainMatch[1]);
   } else {
-    exhibitorContext = '\n\n###DATABASE RESULTS###\nNO RESULTS FOUND FOR THIS QUERY\n###END###';
+    // Fallback: plain text without encoding
+    const plainFallback = text.match(
+      /Content-Type:\s*text\/plain[^\r\n]*\r?\n(?:Content-Transfer-Encoding:\s*7bit\r?\n)?\r?\n([\s\S]*?)(?:\r?\n--|\r?\nContent-Type:|$)/i
+    );
+    if (plainFallback) {
+      body = plainFallback[1];
+    } else {
+      // Last resort: everything after double-CRLF header block
+      const idx = text.indexOf('\r\n\r\n');
+      body = idx > -1 ? text.slice(idx + 4) : text;
+    }
   }
 
-  const systemPrompt = `You are a stand finder and guide for HANNOVER MESSE 2026 visitors. Your ONLY job is to tell visitors exactly where to find companies and what halls to visit using the database results provided to you.
+  // Remove quoted lines (lines starting with ">") and trailing whitespace
+  const lines = body.split('\n')
+    .map(l => l.trimEnd())
+    .filter(l => !l.startsWith('>') && !l.startsWith('On ') && l !== '--');
 
-HANNOVER MESSE 2026:
-- Dates: April 20-24, 2026
-- Location: Hannover, Germany
-- Hours: 9am-6pm daily
-- Getting there: Hannover Hauptbahnhof → direct subway to fairground
+  return lines.join('\n').trim();
+}
 
-HALLS & TOPICS:
-- Hall 11-13: Industrial automation, robotics, motion control
-- Hall 14-15: IIoT, wireless, cloud, IT/OT security, industrial software
-- Hall 16: Digital transformation, AI in manufacturing
-- Hall 17: Energy technologies, hydrogen, energy storage
-- Hall 23: Research & innovation transfer
-- Hall 26: Supply chain, logistics, production technology
-- Hall 27: Industrial components, construction solutions
+// ---------------------------------------------------------------------------
+// IMAP inbox poller — runs every 60 seconds
+// Looks for replies to sent booking emails, auto-classifies them with AI.
+// ---------------------------------------------------------------------------
+async function pollInbox() {
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) return;
 
-TOPIC TO HALL MAPPING - use when someone asks about a topic:
-- Predictive maintenance → Hall 14-15 (industrial software, IIoT)
-- Robotics → Hall 11-13
-- AI / Machine learning → Hall 16
-- Hydrogen → Hall 17
-- Energy storage → Hall 17
-- Cybersecurity → Hall 14-15
-- Cloud computing → Hall 14-15
-- Automation → Hall 11-13
-- Logistics → Hall 26
-- 3D printing → Hall 27
-- Startups → Hall 13
-- Research → Hall 23
-
-ABSOLUTE RULES:
-1. DATABASE RESULTS contains real data. You MUST use it. Always. No exceptions.
-2. If DATABASE RESULTS contains entries, answer using ONLY those entries. Never say you don't have data.
-3. NEVER say "check hannovermesse.de" if data exists in DATABASE RESULTS.
-4. NEVER give generic answers when real data is available.
-5. NEVER say "I couldn't find" if the company IS in DATABASE RESULTS.
-6. For every company found always say: "You can find [company] at [hall and stand]."
-7. If a company has multiple stands, list ALL of them clearly.
-8. If asked about the difference between stands, use HALLS & TOPICS to explain what each hall focuses on.
-9. If topic-based query with NO DATABASE RESULTS, recommend the relevant hall from TOPIC TO HALL MAPPING.
-10. ONLY say a company is not found if DATABASE RESULTS explicitly says NO RESULTS FOUND.
-11. Always speak directly to the visitor using "you". Never use third person.
-12. Answer in the same language the user writes in. In German use "du".
-13. Be warm and helpful like a knowledgeable friend at the fair.${exhibitorContext}`;
+  const client = new ImapFlow({
+    host: 'imap.gmail.com',
+    port: 993,
+    secure: true,
+    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+    logger: false,
+  });
 
   try {
-    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-      model: 'gpt-4o',
-      max_tokens: 1000,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        ...history,
-        { role: 'user', content: message }
-      ]
-    }, {
-      headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-        'Content-Type': 'application/json'
+    await client.connect();
+    await client.mailboxOpen('INBOX');
+
+    const bookings = loadBookings();
+    const pendingIds = new Set(bookings.filter(b => b.status === 'email_sent').map(b => b.id));
+
+    if (pendingIds.size === 0) {
+      await client.logout();
+      return;
+    }
+
+    let changed = false;
+
+    for await (const msg of client.fetch('1:*', { envelope: true, source: true })) {
+      const subject = msg.envelope?.subject || '';
+      const idMatch = subject.match(/\[BK(\d+)\]/);
+      if (!idMatch) continue;
+
+      const bookingId = 'BK' + idMatch[1];
+      if (!pendingIds.has(bookingId)) continue;
+
+      const booking = bookings.find(b => b.id === bookingId);
+
+      const replyText = extractPlainText(msg.source);
+      console.log(`[IMAP] Reply for ${bookingId}:\n${replyText.slice(0, 300)}`);
+
+      if (!replyText || replyText.length < 5) {
+        console.warn(`[IMAP] Empty body for ${bookingId}, skipping.`);
+        continue;
       }
+
+      try {
+        const analysis = await classifyReply(booking, replyText);
+        booking.status = analysis.status;
+        booking.replyText = replyText.slice(0, 2000);
+        booking.replyAnalysis = analysis.summary;
+        booking.repliedAt = new Date().toISOString();
+        changed = true;
+        pendingIds.delete(bookingId);
+        console.log(`[IMAP] Booking ${bookingId} → ${analysis.status}: ${analysis.summary}`);
+      } catch (err) {
+        console.error(`[IMAP] AI error for ${bookingId}:`, err.message);
+      }
+    }
+
+    if (changed) saveBookings(bookings);
+    await client.logout();
+  } catch (err) {
+    console.error('[IMAP] Poll error:', err.message);
+    try { await client.logout(); } catch (_) {}
+  }
+}
+
+// Start polling after 5s delay, then every 60s
+setTimeout(() => {
+  pollInbox();
+  setInterval(pollInbox, 60 * 1000);
+}, 5000);
+
+// ---------------------------------------------------------------------------
+// GET /exhibitors
+// ---------------------------------------------------------------------------
+app.get('/exhibitors', (req, res) => {
+  const { q, hall, limit = 30 } = req.query;
+  let results = exhibitors;
+
+  if (q) {
+    const query = q.toLowerCase();
+    results = results.filter(e =>
+      e.name?.toLowerCase().includes(query) ||
+      e.country?.toLowerCase().includes(query) ||
+      e.city?.toLowerCase().includes(query)
+    );
+  }
+  if (hall) results = results.filter(e => e.booth?.includes(`Hall ${hall}`));
+
+  res.json({ total: results.length, results: results.slice(0, parseInt(limit, 10)) });
+});
+
+// ---------------------------------------------------------------------------
+// POST /bookings
+// ---------------------------------------------------------------------------
+app.post('/bookings', (req, res) => {
+  const { exhibitor, visitor } = req.body;
+  if (!exhibitor?.name || !visitor?.name || !visitor?.email)
+    return res.status(400).json({ error: 'exhibitor.name, visitor.name and visitor.email are required.' });
+
+  const bookings = loadBookings();
+  const booking = {
+    id: `BK${Date.now()}${Math.floor(Math.random() * 1000)}`,
+    exhibitor,
+    visitor,
+    createdAt: new Date().toISOString(),
+    status: 'draft',
+  };
+
+  bookings.push(booking);
+  saveBookings(bookings);
+  console.log(`[Server] Booking ${booking.id} (draft): ${visitor.name} → ${exhibitor.name}`);
+  res.json({ success: true, booking });
+});
+
+// ---------------------------------------------------------------------------
+// GET /bookings
+// ---------------------------------------------------------------------------
+app.get('/bookings', (req, res) => res.json(loadBookings()));
+
+// ---------------------------------------------------------------------------
+// DELETE /bookings/:id
+// ---------------------------------------------------------------------------
+app.delete('/bookings/:id', (req, res) => {
+  let bookings = loadBookings();
+  const before = bookings.length;
+  bookings = bookings.filter(b => b.id !== req.params.id);
+  if (bookings.length === before) return res.status(404).json({ error: 'Booking not found.' });
+  saveBookings(bookings);
+  res.json({ success: true });
+});
+
+// ---------------------------------------------------------------------------
+// GET /bookings/:id/email-draft
+// ---------------------------------------------------------------------------
+app.get('/bookings/:id/email-draft', (req, res) => {
+  const booking = loadBookings().find(b => b.id === req.params.id);
+  if (!booking) return res.status(404).json({ error: 'Booking not found.' });
+  if (booking.emailSubject && booking.emailBody)
+    return res.json({ subject: booking.emailSubject, body: booking.emailBody });
+  res.json(generateEmailDraft(booking));
+});
+
+// ---------------------------------------------------------------------------
+// POST /bookings/:id/send
+// ---------------------------------------------------------------------------
+app.post('/bookings/:id/send', async (req, res) => {
+  const { recipientEmail, subject, body } = req.body;
+  if (!recipientEmail || !subject || !body)
+    return res.status(400).json({ error: 'recipientEmail, subject, and body are required.' });
+
+  const bookings = loadBookings();
+  const booking = bookings.find(b => b.id === req.params.id);
+  if (!booking) return res.status(404).json({ error: 'Booking not found.' });
+
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS)
+    return res.status(503).json({ error: 'SMTP not configured in .env.' });
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || '587', 10),
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
     });
 
-    res.json({ reply: response.data.choices[0].message.content });
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+      to: recipientEmail,
+      subject,
+      text: body,
+    });
+
+    booking.status = 'email_sent';
+    booking.emailSentAt = new Date().toISOString();
+    booking.recipientEmail = recipientEmail;
+    booking.emailSubject = subject;
+    booking.emailBody = body;
+    saveBookings(bookings);
+
+    console.log(`[Server] Email sent for booking ${booking.id} → ${recipientEmail}`);
+    res.json({ success: true });
   } catch (err) {
-    console.error(err.response?.data || err.message);
-    res.status(500).json({ error: 'Something went wrong' });
+    console.error('[Server] SMTP error:', err.message);
+    res.status(500).json({ error: `SMTP error: ${err.message}` });
   }
 });
 
-app.listen(3000, () => {
-  console.log('Server running on http://localhost:3000');
+// ---------------------------------------------------------------------------
+// POST /contact (Puppeteer)
+// ---------------------------------------------------------------------------
+app.post('/contact', async (req, res) => {
+  const { exhibitor, sender } = req.body;
+  if (!exhibitor?.name || !exhibitor?.directLinkId)
+    return res.status(400).json({ error: 'exhibitor.name and exhibitor.directLinkId are required.' });
+  if (!sender?.firstName || !sender?.lastName || !sender?.email || !sender?.message)
+    return res.status(400).json({ error: 'sender.firstName, lastName, email and message are required.' });
+
+  const result = await submitContactForm(exhibitor, sender);
+  if (result.success) return res.json({ success: true, message: result.message });
+  return res.status(500).json({ success: false, error: result.message });
+});
+
+// ---------------------------------------------------------------------------
+// GET /preview-url
+// ---------------------------------------------------------------------------
+app.get('/preview-url', (req, res) => {
+  const { name, directLinkId } = req.query;
+  if (!name || !directLinkId) return res.status(400).json({ error: 'name and directLinkId required.' });
+  res.json({ url: buildContactUrl(name, directLinkId) });
+});
+
+// ---------------------------------------------------------------------------
+// POST /classify-reply  (used by local server when OpenAI key is on Railway)
+// Body: { booking, replyText }
+// ---------------------------------------------------------------------------
+app.post('/classify-reply', async (req, res) => {
+  const { booking, replyText } = req.body;
+  if (!booking || !replyText) return res.status(400).json({ error: 'booking and replyText required.' });
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You analyze email replies to trade fair meeting requests. ' +
+            'Classify the reply and respond with JSON only — no markdown. ' +
+            'Schema: {"status": "confirmed" | "declined" | "uncertain", "summary": "<one concise sentence in German describing the outcome>"}'
+        },
+        {
+          role: 'user',
+          content: `Original meeting request was for: ${booking.exhibitor.name}, ${booking.exhibitor.booth || ''}.\n\nReply received:\n\n${replyText}`
+        }
+      ],
+      response_format: { type: 'json_object' },
+      temperature: 0,
+    });
+    res.json(JSON.parse(completion.choices[0].message.content));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Health check
+// ---------------------------------------------------------------------------
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
+
+app.listen(PORT, () => {
+  console.log(`[MesseContactAgent] Running on http://localhost:${PORT}`);
 });

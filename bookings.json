@@ -1,0 +1,46 @@
+[
+  {
+    "id": "BK1774783764291989",
+    "exhibitor": {
+      "name": "Siemens AG",
+      "booth": "Hall 13, Stand C24",
+      "directLinkId": "N1577303"
+    },
+    "visitor": {
+      "name": "Hannes Hennerbichler",
+      "email": "h@test.de",
+      "company": "Heise",
+      "preferredDate": "2026-04-22",
+      "preferredTime": "11:00",
+      "message": "Interesse an Automatisierungslösungen"
+    },
+    "createdAt": "2026-03-29T11:29:24.291Z",
+    "status": "email_sent",
+    "emailSentAt": "2026-03-29T15:23:23.290Z",
+    "recipientEmail": "hannes.hennerbichler@gmail.com",
+    "emailSubject": "blabla",
+    "emailBody": "Dear Siemens AG team,\n\nMy name is Hannes Hennerbichler, representing Heise. I am visiting HANNOVER MESSE 2026 (April 20–24, Hannover) and would very much like to schedule a meeting at your booth (Hall 13, Stand C24).\n\nMy preferred time would be Mittwoch, 22. April 2026 at 11:00.\n\nTopics I'd like to discuss:\nInteresse an Automatisierungslösungen\n\nPlease let me know if this works for you, or suggest an alternative time that suits your schedule.\n\nBest regards,\nHannes Hennerbichler\nHeise\nh@test.de"
+  },
+  {
+    "id": "BK1774804689289321",
+    "exhibitor": {
+      "name": "Microsoft Corporation",
+      "booth": "Hall 17, Stand G06",
+      "directLinkId": "N1479704"
+    },
+    "visitor": {
+      "name": "Hannes Hennerbichler",
+      "email": "hannes.hennerbichler@gmail.com",
+      "company": "",
+      "preferredDate": "2026-03-22",
+      "preferredTime": "09:00",
+      "message": "Copilot"
+    },
+    "createdAt": "2026-03-29T17:18:09.289Z",
+    "status": "email_sent",
+    "emailSentAt": "2026-03-29T17:19:10.733Z",
+    "recipientEmail": "hannes.hennerbichler@gmail.com",
+    "emailSubject": "Meeting request at HANNOVER MESSE 2026 – Hannes Hennerbichler [BK1774804689289321]",
+    "emailBody": "Dear Microsoft Corporation team,\n\nMy name is Hannes Hennerbichler. I am visiting HANNOVER MESSE 2026 (April 20–24, Hannover) and would very much like to schedule a meeting at your booth (Hall 17, Stand G06).\n\nMy preferred time would be Sonntag, 22. März 2026 at 09:00.\n\nTopics I'd like to discuss:\nCopilot\n\nPlease let me know if this works for you, or suggest an alternative time that suits your schedule.\n\nBest regards,\nHannes Hennerbichler"
+  }
+]

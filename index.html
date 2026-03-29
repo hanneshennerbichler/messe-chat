@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,34 +13,12 @@
       height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
 
-    #mic {
-  background: #f2f2f7;
-  border: 1px solid rgba(0,0,0,0.1);
-  border-radius: 10px;
-  width: 34px;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: all 0.15s ease;
-  color: #1c1c1e;
-}
-
-#mic:hover { background: #e5e5ea; }
-#mic.recording { background: #ff3b30; border-color: #ff3b30; color: white; animation: pulse-mic 1s infinite; }
-
-@keyframes pulse-mic {
-  0% { box-shadow: 0 0 0 0 rgba(255,59,48,0.4); }
-  70% { box-shadow: 0 0 0 8px rgba(255,59,48,0); }
-  100% { box-shadow: 0 0 0 0 rgba(255,59,48,0); }
-}
-
+    /* ── Nav ── */
     nav {
-      background: rgba(255,255,255,0.85);
+      background: rgba(255,255,255,0.92);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid rgba(0,0,0,0.08);
@@ -48,10 +26,11 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 28px;
+      padding: 0 20px;
       position: sticky;
       top: 0;
       z-index: 100;
+      flex-shrink: 0;
     }
 
     .nav-title {
@@ -71,13 +50,65 @@
       padding: 4px 12px;
     }
 
+    /* ── Tab bar ── */
+    .tab-bar {
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      display: flex;
+      padding: 0 20px;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .tab {
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #636366;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s ease;
+      margin-bottom: -1px;
+    }
+
+    .tab.active {
+      color: #1c1c1e;
+      border-bottom-color: #1c1c1e;
+      font-weight: 600;
+    }
+
+    .tab:hover:not(.active) { color: #3a3a3c; }
+
+    /* ── Panel container ── */
+    .panels {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel {
+      display: none;
+      flex: 1;
+      overflow-y: auto;
+      flex-direction: column;
+    }
+
+    .panel.active { display: flex; }
+
+    /* ══════════════════════════════════════
+       CHAT PANEL
+    ══════════════════════════════════════ */
     #chat {
       flex: 1;
       overflow-y: auto;
-      padding: 28px 24px;
+      padding: 24px 20px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
       max-width: 760px;
       width: 100%;
       margin: 0 auto;
@@ -86,7 +117,7 @@
     .hero {
       background: white;
       border-radius: 20px;
-      padding: 28px;
+      padding: 24px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
       margin-bottom: 4px;
     }
@@ -101,31 +132,31 @@
     }
 
     .hero h2 {
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 700;
       letter-spacing: -0.04em;
       color: #1c1c1e;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       line-height: 1.2;
     }
 
     .hero p {
-      font-size: 15px;
+      font-size: 14px;
       color: #636366;
       line-height: 1.6;
     }
 
     .hero-stats {
       display: flex;
-      gap: 10px;
-      margin-top: 20px;
+      gap: 8px;
+      margin-top: 16px;
       flex-wrap: wrap;
     }
 
     .stat {
       background: #f2f2f7;
       border-radius: 12px;
-      padding: 10px 14px;
+      padding: 8px 12px;
       font-size: 13px;
       font-weight: 500;
       color: #1c1c1e;
@@ -141,7 +172,7 @@
 
     .message {
       max-width: 640px;
-      padding: 14px 18px;
+      padding: 12px 16px;
       border-radius: 18px;
       font-size: 15px;
       line-height: 1.65;
@@ -164,16 +195,13 @@
       white-space: pre-wrap;
     }
 
-    .assistant.loading {
-      color: #aeaeb2;
-      font-style: italic;
-    }
+    .assistant.loading { color: #aeaeb2; font-style: italic; }
 
     .suggestions-area {
       max-width: 760px;
       width: 100%;
       margin: 0 auto;
-      padding: 4px 24px 16px;
+      padding: 4px 20px 12px;
     }
 
     .suggestions-label {
@@ -182,20 +210,20 @@
       text-transform: uppercase;
       letter-spacing: 0.07em;
       color: #aeaeb2;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .suggestions {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 6px;
     }
 
     .suggestion {
       background: white;
       border: 1px solid rgba(0,0,0,0.1);
       border-radius: 20px;
-      padding: 8px 16px;
+      padding: 7px 14px;
       font-size: 13px;
       font-weight: 500;
       cursor: pointer;
@@ -204,18 +232,14 @@
       transition: all 0.15s ease;
     }
 
-    .suggestion:hover {
-      background: #1c1c1e;
-      color: white;
-      border-color: #1c1c1e;
-    }
+    .suggestion:hover { background: #1c1c1e; color: white; border-color: #1c1c1e; }
 
     .input-bar {
-      background: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.92);
       backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
       border-top: 1px solid rgba(0,0,0,0.08);
-      padding: 14px 24px 24px;
+      padding: 12px 20px 20px;
+      flex-shrink: 0;
     }
 
     .input-inner {
@@ -223,11 +247,11 @@
       margin: 0 auto;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       background: white;
       border: 1px solid rgba(0,0,0,0.12);
       border-radius: 14px;
-      padding: 8px 8px 8px 18px;
+      padding: 7px 7px 7px 16px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.06);
       transition: box-shadow 0.2s, border-color 0.2s;
     }
@@ -246,20 +270,44 @@
       font-size: 15px;
       outline: none;
       resize: none;
-      height: 34px;
+      height: 32px;
       line-height: 1.4;
       font-family: inherit;
     }
 
     #input::placeholder { color: #aeaeb2; }
 
+    #mic {
+      background: #f2f2f7;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 10px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+      color: #1c1c1e;
+    }
+
+    #mic:hover { background: #e5e5ea; }
+    #mic.recording { background: #ff3b30; border-color: #ff3b30; color: white; animation: pulse-mic 1s infinite; }
+
+    @keyframes pulse-mic {
+      0%   { box-shadow: 0 0 0 0 rgba(255,59,48,0.4); }
+      70%  { box-shadow: 0 0 0 8px rgba(255,59,48,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,59,48,0); }
+    }
+
     #send {
       background: #1c1c1e;
       color: white;
       border: none;
       border-radius: 10px;
-      width: 34px;
-      height: 34px;
+      width: 32px;
+      height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -270,6 +318,501 @@
 
     #send:hover { background: #3a3a3c; }
     #send:disabled { background: #d1d1d6; cursor: not-allowed; }
+
+    /* ══════════════════════════════════════
+       MAP PANEL
+    ══════════════════════════════════════ */
+    #panel-map {
+      padding: 0;
+    }
+
+    .map-header {
+      padding: 20px 20px 16px;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .map-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+    }
+
+    .map-header p {
+      font-size: 13px;
+      color: #636366;
+    }
+
+    .map-search-bar {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+      max-width: 420px;
+    }
+
+    .map-search-bar input {
+      flex: 1;
+      background: white;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 14px;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.15s;
+    }
+
+    .map-search-bar input:focus { border-color: rgba(0,0,0,0.3); }
+
+    .map-search-bar button {
+      background: #1c1c1e;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s;
+    }
+
+    .map-search-bar button:hover { background: #3a3a3c; }
+
+    .map-container {
+      padding: 0 20px 24px;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .map-svg-wrap {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    .hall-box {
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .hall-box:hover { opacity: 0.85; }
+    .hall-box.highlighted rect { stroke: #ff9500 !important; stroke-width: 3 !important; }
+    .hall-box.highlighted text { fill: #1c1c1e !important; }
+
+    .map-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #3a3a3c;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .map-result-list {
+      margin-top: 16px;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .map-result-list h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #636366;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 12px 16px 8px;
+      border-bottom: 1px solid #f2f2f7;
+    }
+
+    .map-result-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid #f2f2f7;
+      font-size: 14px;
+    }
+
+    .map-result-item:last-child { border-bottom: none; }
+
+    .map-result-name { font-weight: 500; color: #1c1c1e; }
+    .map-result-meta { font-size: 12px; color: #636366; margin-top: 2px; }
+
+    .map-result-actions { display: flex; gap: 6px; flex-shrink: 0; margin-left: 12px; }
+
+    .btn-small {
+      background: #f2f2f7;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      color: #1c1c1e;
+      font-family: inherit;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-small:hover { background: #e5e5ea; }
+
+    .btn-small.primary {
+      background: #1c1c1e;
+      color: white;
+      border-color: #1c1c1e;
+    }
+
+    .btn-small.primary:hover { background: #3a3a3c; }
+
+    /* ══════════════════════════════════════
+       BOOKINGS PANEL
+    ══════════════════════════════════════ */
+    #panel-bookings {
+      padding: 0;
+    }
+
+    .bookings-header {
+      padding: 20px 20px 16px;
+      max-width: 760px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .bookings-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+    }
+
+    .bookings-header p { font-size: 13px; color: #636366; }
+
+    .btn-add-booking {
+      background: #1c1c1e;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 9px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+
+    .btn-add-booking:hover { background: #3a3a3c; }
+
+    .bookings-list {
+      padding: 0 20px 24px;
+      max-width: 760px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .booking-card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px 18px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .booking-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .booking-exhibitor {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1c1c1e;
+      letter-spacing: -0.02em;
+    }
+
+    .booking-booth {
+      font-size: 13px;
+      color: #636366;
+      margin-top: 3px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .booking-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    .badge-draft     { background: #f2f2f7; color: #636366; border: 1px solid rgba(0,0,0,0.1); }
+    .badge-email_sent { background: #dbeafe; color: #1d4ed8; }
+    .badge-confirmed { background: #d1fae5; color: #065f46; }
+    .badge-declined  { background: #fee2e2; color: #991b1b; }
+    .badge-uncertain { background: #fef3c7; color: #92400e; }
+
+    .booking-detail-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #f2f2f7;
+    }
+
+    .booking-detail {
+      font-size: 12px;
+      color: #636366;
+    }
+
+    .booking-detail strong { color: #1c1c1e; display: block; font-size: 13px; }
+
+    .btn-cancel {
+      background: transparent;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      color: #ff3b30;
+      font-family: inherit;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+
+    .btn-cancel:hover { background: #fff1f0; border-color: #ff3b30; }
+
+    .bookings-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: #aeaeb2;
+    }
+
+    .bookings-empty svg { margin-bottom: 16px; opacity: 0.4; }
+    .bookings-empty p { font-size: 15px; }
+    .bookings-empty span { font-size: 13px; display: block; margin-top: 6px; }
+
+    /* ══════════════════════════════════════
+       BOOKING MODAL
+    ══════════════════════════════════════ */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: white;
+      border-radius: 20px;
+      padding: 28px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+    }
+
+    .modal-subtitle {
+      font-size: 14px;
+      color: #636366;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #636366;
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      background: #f2f2f7;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 15px;
+      color: #1c1c1e;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      background: white;
+      border-color: rgba(0,0,0,0.3);
+    }
+
+    .form-group textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+
+    .form-row { display: flex; gap: 10px; }
+    .form-row .form-group { flex: 1; }
+
+    .exhibitor-search-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .exhibitor-search-row input { flex: 1; }
+
+    .exhibitor-search-row button {
+      background: #f2f2f7;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      color: #1c1c1e;
+      font-family: inherit;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    .exhibitor-search-row button:hover { background: #e5e5ea; }
+
+    #exhibitorDropdown {
+      background: white;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 10px;
+      max-height: 160px;
+      overflow-y: auto;
+      margin-top: 4px;
+      display: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+
+    #exhibitorDropdown.open { display: block; }
+
+    .dropdown-item {
+      padding: 9px 14px;
+      cursor: pointer;
+      font-size: 14px;
+      border-bottom: 1px solid #f2f2f7;
+      transition: background 0.1s;
+    }
+
+    .dropdown-item:last-child { border-bottom: none; }
+    .dropdown-item:hover { background: #f2f2f7; }
+    .dropdown-item small { display: block; font-size: 12px; color: #636366; }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid #f2f2f7;
+    }
+
+    .btn-modal-cancel {
+      background: transparent;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 12px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      color: #636366;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+
+    .btn-modal-cancel:hover { background: #f2f2f7; color: #1c1c1e; }
+
+    .btn-modal-confirm {
+      background: #1c1c1e;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s;
+    }
+
+    .btn-modal-confirm:hover { background: #3a3a3c; }
+    .btn-modal-confirm:disabled { background: #aeaeb2; cursor: not-allowed; }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      padding: 10px;
+      font-size: 12px;
+      color: #aeaeb2;
+      background: white;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      flex-shrink: 0;
+    }
   </style>
 </head>
 <body>
@@ -279,35 +822,46 @@
   <span class="nav-badge">HANNOVER MESSE 2026</span>
 </nav>
 
-<div id="chat">
-  <div class="hero">
-    <div class="hero-eyebrow">Your personal guide</div>
-    <h2>Welcome to HANNOVER MESSE 2026</h2>
-    <p>Ask me anything — I can find exhibitors from our database of 2,700+ companies, help you navigate the halls, and plan your visit.</p>
-    <div class="hero-stats">
-      <div class="stat">April 20–24, 2026 <span>Fair dates</span></div>
-      <div class="stat">2,700+ Exhibitors <span>In our database</span></div>
-      <div class="stat">Hannover, Germany <span>Location</span></div>
+<div class="tab-bar">
+  <button class="tab active" onclick="switchTab('chat')">💬 Chat</button>
+  <button class="tab" onclick="switchTab('map')">🗺 Messeplan</button>
+  <button class="tab" onclick="switchTab('bookings')">📅 Meine Buchungen</button>
+</div>
+
+<div class="panels">
+
+  <!-- ══════════════════ CHAT PANEL ══════════════════ -->
+  <div id="panel-chat" class="panel active" style="display:flex; flex-direction:column; overflow:hidden;">
+
+    <div id="chat">
+      <div class="hero">
+        <div class="hero-eyebrow">Dein persönlicher Messeführer</div>
+        <h2>Willkommen auf der HANNOVER MESSE 2026</h2>
+        <p>Frag mich alles — ich finde Aussteller aus unserer Datenbank mit 2.700+ Unternehmen, helfe dir bei der Navigation durch die Hallen und plane deinen Besuch.</p>
+        <div class="hero-stats">
+          <div class="stat">20.–24. April 2026 <span>Messetermine</span></div>
+          <div class="stat">2.700+ Aussteller <span>In unserer Datenbank</span></div>
+          <div class="stat">Hannover, Deutschland <span>Standort</span></div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<div class="suggestions-area">
-  <div class="suggestions-label">Try asking</div>
-  <div class="suggestions">
-    <button class="suggestion" onclick="ask('Show me robotics companies')">🤖 Robotics companies</button>
-    <button class="suggestion" onclick="ask('Which German companies are exhibiting?')">🇩🇪 German exhibitors</button>
-    <button class="suggestion" onclick="ask('Show me companies in Hall 17')">🏛 Hall 17</button>
-    <button class="suggestion" onclick="ask('Tell me about hydrogen technology exhibitors')">⚡ Hydrogen tech</button>
-    <button class="suggestion" onclick="ask('Show me startups exhibiting')">🚀 Startups</button>
-    <button class="suggestion" onclick="ask('How do I get to Hannover Messe?')">🚆 Getting there</button>
-  </div>
-</div>
+    <div class="suggestions-area">
+      <div class="suggestions-label">Probier es aus</div>
+      <div class="suggestions">
+        <button class="suggestion" onclick="ask('Zeig mir Robotik-Unternehmen')">🤖 Robotik</button>
+        <button class="suggestion" onclick="ask('Welche deutschen Unternehmen stellen aus?')">🇩🇪 Deutsche Aussteller</button>
+        <button class="suggestion" onclick="ask('Zeig mir Unternehmen in Halle 17')">🏛 Halle 17</button>
+        <button class="suggestion" onclick="ask('Wasserstofftechnologie Aussteller')">⚡ Wasserstoff</button>
+        <button class="suggestion" onclick="ask('Zeig mir Start-ups auf der Messe')">🚀 Start-ups</button>
+        <button class="suggestion" onclick="switchTab('bookings')">📅 Buchungen verwalten</button>
+      </div>
+    </div>
 
-<div class="input-bar">
-    <div class="input-inner">
-        <textarea id="input" placeholder="Ask about exhibitors, halls, topics..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"></textarea>
-        <button id="mic" onclick="toggleMic()" title="Speak">
+    <div class="input-bar">
+      <div class="input-inner">
+        <textarea id="input" placeholder="Frag nach Ausstellern, Hallen, Themen …" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"></textarea>
+        <button id="mic" onclick="toggleMic()" title="Sprechen">
           <svg id="mic-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
             <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
@@ -322,99 +876,424 @@
           </svg>
         </button>
       </div>
+    </div>
+
+  </div><!-- end chat panel -->
+
+
+  <!-- ══════════════════ MAP PANEL ══════════════════ -->
+  <div id="panel-map" class="panel" style="overflow-y:auto;">
+
+    <div class="map-header">
+      <div>
+        <h2>Messegeländeplan</h2>
+        <p>HANNOVER MESSE 2026 · 20.–24. April · Hannover</p>
+      </div>
+      <div class="map-search-bar" style="margin-top:12px;">
+        <input id="mapSearch" type="text" placeholder="Aussteller oder Halle suchen …" oninput="debouncedMapSearch()" onkeydown="if(event.key==='Enter') doMapSearch()">
+        <button onclick="doMapSearch()">Suchen</button>
+      </div>
+    </div>
+
+    <div class="map-container">
+      <div class="map-svg-wrap">
+
+        <!-- SVG Geländeplan -->
+        <svg id="hallMap" viewBox="0 0 780 360" width="100%" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+          <defs>
+            <style>
+              .hall-label { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+            </style>
+          </defs>
+
+          <!-- Grounds background -->
+          <rect width="780" height="360" rx="12" fill="#f0f4f8"/>
+
+          <!-- Compass + scale hint -->
+          <text x="16" y="20" font-size="10" fill="#9ca3af" font-family="-apple-system,sans-serif">NORD ↑</text>
+          <text x="640" y="20" font-size="10" fill="#9ca3af" font-family="-apple-system,sans-serif">Eingang Ost (Hermesallee)</text>
+
+          <!-- Roads / paths -->
+          <rect x="0" y="170" width="780" height="20" fill="#e2e8f0" rx="0"/>
+          <text x="340" y="183" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="-apple-system,sans-serif">HERMESALLEE</text>
+
+          <!-- ── NORTH ROW: Hallen 11, 12, 13 ── -->
+          <!-- Hall 11 -->
+          <g class="hall-box" id="hall-11" onclick="highlightHall(11)" data-hall="11">
+            <rect x="30" y="30" width="120" height="120" rx="10" fill="#3b82f6" fill-opacity="0.15" stroke="#3b82f6" stroke-width="1.5"/>
+            <text x="90" y="82" text-anchor="middle" font-size="22" font-weight="700" fill="#1e40af" class="hall-label">11</text>
+            <text x="90" y="101" text-anchor="middle" font-size="9" fill="#3b82f6" class="hall-label">Energie</text>
+            <text x="90" y="113" text-anchor="middle" font-size="9" fill="#3b82f6" class="hall-label">Transition</text>
+          </g>
+
+          <!-- Hall 12 -->
+          <g class="hall-box" id="hall-12" onclick="highlightHall(12)" data-hall="12">
+            <rect x="165" y="30" width="120" height="120" rx="10" fill="#3b82f6" fill-opacity="0.15" stroke="#3b82f6" stroke-width="1.5"/>
+            <text x="225" y="82" text-anchor="middle" font-size="22" font-weight="700" fill="#1e40af" class="hall-label">12</text>
+            <text x="225" y="101" text-anchor="middle" font-size="9" fill="#3b82f6" class="hall-label">Energie</text>
+            <text x="225" y="113" text-anchor="middle" font-size="9" fill="#3b82f6" class="hall-label">Lösungen</text>
+          </g>
+
+          <!-- Hall 13 -->
+          <g class="hall-box" id="hall-13" onclick="highlightHall(13)" data-hall="13">
+            <rect x="300" y="30" width="130" height="120" rx="10" fill="#8b5cf6" fill-opacity="0.15" stroke="#8b5cf6" stroke-width="1.5"/>
+            <text x="365" y="82" text-anchor="middle" font-size="22" font-weight="700" fill="#6d28d9" class="hall-label">13</text>
+            <text x="365" y="101" text-anchor="middle" font-size="9" fill="#7c3aed" class="hall-label">Digital</text>
+            <text x="365" y="113" text-anchor="middle" font-size="9" fill="#7c3aed" class="hall-label">Ecosystem</text>
+          </g>
+
+          <!-- AGORA -->
+          <rect x="445" y="30" width="100" height="120" rx="10" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <text x="495" y="88" text-anchor="middle" font-size="13" font-weight="600" fill="#94a3b8" class="hall-label">AGORA</text>
+          <text x="495" y="103" text-anchor="middle" font-size="9" fill="#94a3b8" class="hall-label">Außengelände</text>
+
+          <!-- Hall 27 (top-right) -->
+          <g class="hall-box" id="hall-27" onclick="highlightHall(27)" data-hall="27">
+            <rect x="560" y="30" width="190" height="120" rx="10" fill="#10b981" fill-opacity="0.15" stroke="#10b981" stroke-width="1.5"/>
+            <text x="655" y="82" text-anchor="middle" font-size="22" font-weight="700" fill="#065f46" class="hall-label">27</text>
+            <text x="655" y="101" text-anchor="middle" font-size="9" fill="#059669" class="hall-label">Robotik &</text>
+            <text x="655" y="113" text-anchor="middle" font-size="9" fill="#059669" class="hall-label">Automation</text>
+          </g>
+
+          <!-- ── SOUTH ROW: Hallen 15, 16, 17, 25, 26 ── -->
+          <!-- Hall 15 -->
+          <g class="hall-box" id="hall-15" onclick="highlightHall(15)" data-hall="15">
+            <rect x="30" y="205" width="120" height="130" rx="10" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b" stroke-width="1.5"/>
+            <text x="90" y="263" text-anchor="middle" font-size="22" font-weight="700" fill="#92400e" class="hall-label">15</text>
+            <text x="90" y="282" text-anchor="middle" font-size="9" fill="#b45309" class="hall-label">Digital</text>
+            <text x="90" y="294" text-anchor="middle" font-size="9" fill="#b45309" class="hall-label">Factory</text>
+          </g>
+
+          <!-- Hall 16 -->
+          <g class="hall-box" id="hall-16" onclick="highlightHall(16)" data-hall="16">
+            <rect x="165" y="205" width="120" height="130" rx="10" fill="#ec4899" fill-opacity="0.15" stroke="#ec4899" stroke-width="1.5"/>
+            <text x="225" y="263" text-anchor="middle" font-size="22" font-weight="700" fill="#9d174d" class="hall-label">16</text>
+            <text x="225" y="282" text-anchor="middle" font-size="9" fill="#be185d" class="hall-label">Künstliche</text>
+            <text x="225" y="294" text-anchor="middle" font-size="9" fill="#be185d" class="hall-label">Intelligenz</text>
+          </g>
+
+          <!-- Hall 17 -->
+          <g class="hall-box" id="hall-17" onclick="highlightHall(17)" data-hall="17">
+            <rect x="300" y="205" width="130" height="130" rx="10" fill="#f97316" fill-opacity="0.15" stroke="#f97316" stroke-width="1.5"/>
+            <text x="365" y="263" text-anchor="middle" font-size="22" font-weight="700" fill="#9a3412" class="hall-label">17</text>
+            <text x="365" y="282" text-anchor="middle" font-size="9" fill="#c2410c" class="hall-label">Antriebe &</text>
+            <text x="365" y="294" text-anchor="middle" font-size="9" fill="#c2410c" class="hall-label">Automation</text>
+          </g>
+
+          <!-- Hall 25 -->
+          <g class="hall-box" id="hall-25" onclick="highlightHall(25)" data-hall="25">
+            <rect x="445" y="205" width="95" height="130" rx="10" fill="#06b6d4" fill-opacity="0.15" stroke="#06b6d4" stroke-width="1.5"/>
+            <text x="492" y="263" text-anchor="middle" font-size="22" font-weight="700" fill="#164e63" class="hall-label">25</text>
+            <text x="492" y="282" text-anchor="middle" font-size="9" fill="#0e7490" class="hall-label">Wasserstoff</text>
+            <text x="492" y="294" text-anchor="middle" font-size="9" fill="#0e7490" class="hall-label">Brennstoffzelle</text>
+          </g>
+
+          <!-- Hall 26 -->
+          <g class="hall-box" id="hall-26" onclick="highlightHall(26)" data-hall="26">
+            <rect x="553" y="205" width="100" height="130" rx="10" fill="#84cc16" fill-opacity="0.15" stroke="#84cc16" stroke-width="1.5"/>
+            <text x="603" y="263" text-anchor="middle" font-size="22" font-weight="700" fill="#3f6212" class="hall-label">26</text>
+            <text x="603" y="282" text-anchor="middle" font-size="9" fill="#4d7c0f" class="hall-label">Ind.</text>
+            <text x="603" y="294" text-anchor="middle" font-size="9" fill="#4d7c0f" class="hall-label">Automation</text>
+          </g>
+
+          <!-- Hall 19 (smaller, between rows) -->
+          <g class="hall-box" id="hall-19" onclick="highlightHall(19)" data-hall="19">
+            <rect x="665" y="205" width="85" height="130" rx="10" fill="#a78bfa" fill-opacity="0.15" stroke="#a78bfa" stroke-width="1.5"/>
+            <text x="707" y="263" text-anchor="middle" font-size="18" font-weight="700" fill="#5b21b6" class="hall-label">19</text>
+            <text x="707" y="280" text-anchor="middle" font-size="9" fill="#6d28d9" class="hall-label">Forschung</text>
+            <text x="707" y="292" text-anchor="middle" font-size="9" fill="#6d28d9" class="hall-label">&amp; Technol.</text>
+          </g>
+
+          <!-- Eingang Ost marker -->
+          <rect x="744" y="155" width="36" height="50" rx="6" fill="#1c1c1e"/>
+          <text x="762" y="177" text-anchor="middle" font-size="8" fill="white" font-weight="600" class="hall-label">EIN-</text>
+          <text x="762" y="188" text-anchor="middle" font-size="8" fill="white" font-weight="600" class="hall-label">GANG</text>
+          <text x="762" y="199" text-anchor="middle" font-size="8" fill="white" font-weight="600" class="hall-label">OST</text>
+
+        </svg>
+
+        <!-- Legend -->
+        <div class="map-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div> Energie (H11, H12)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div> Digital Ecosystem (H13)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div> Digital Factory (H15)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#ec4899"></div> KI (H16)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#f97316"></div> Automation (H17)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#06b6d4"></div> Wasserstoff (H25)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#84cc16"></div> Ind. Automation (H26)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div> Robotik (H27)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#a78bfa"></div> Forschung (H19)</div>
+        </div>
+
+        <p style="font-size:11px; color:#aeaeb2; margin-top:12px;">
+          Schematischer Übersichtsplan · Nicht maßstabsgetreu ·
+          <a href="https://www.hannovermesse.de/de/hallenplan/" target="_blank" style="color:#636366;">Offizieller Hallenplan ↗</a>
+        </p>
+      </div>
+
+      <!-- Search results list -->
+      <div id="mapResultList" class="map-result-list" style="display:none;">
+        <h3 id="mapResultTitle">Suchergebnisse</h3>
+        <div id="mapResultItems"></div>
+      </div>
+
+    </div>
+  </div><!-- end map panel -->
+
+
+  <!-- ══════════════════ BOOKINGS PANEL ══════════════════ -->
+  <div id="panel-bookings" class="panel" style="overflow-y:auto;">
+
+    <div class="bookings-header">
+      <div>
+        <h2>Meine Buchungen</h2>
+        <p>Geplante Standbesuche und Meetings auf der HANNOVER MESSE 2026</p>
+      </div>
+      <button class="btn-add-booking" onclick="openBookingModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Buchung anlegen
+      </button>
+    </div>
+
+    <div class="bookings-list" id="bookingsList">
+      <!-- filled by JS -->
+    </div>
+
+  </div><!-- end bookings panel -->
+
+</div><!-- end panels -->
+
+<!-- ══════════════════ BOOKING MODAL ══════════════════ -->
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal">
+    <div class="modal-title">Standbesuch buchen</div>
+    <div class="modal-subtitle" id="modalSubtitle">Meeting mit einem Aussteller auf der HANNOVER MESSE 2026 planen</div>
+
+    <div class="form-group">
+      <label>Aussteller *</label>
+      <div class="exhibitor-search-row">
+        <input id="exhibitorSearchInput" type="text" placeholder="Name eingeben …" oninput="searchExhibitorsDebounced()">
+        <button onclick="searchExhibitors()">Suchen</button>
+      </div>
+      <div id="exhibitorDropdown"></div>
+      <input type="hidden" id="selectedExhibitorName">
+      <input type="hidden" id="selectedExhibitorBooth">
+      <input type="hidden" id="selectedExhibitorDirectLinkId">
+    </div>
+
+    <div id="selectedExhibitorPreview" style="display:none; background:#f2f2f7; border-radius:10px; padding:10px 14px; margin-bottom:14px; font-size:14px;">
+      <strong id="previewName"></strong>
+      <div style="font-size:12px; color:#636366; margin-top:2px;" id="previewBooth"></div>
+    </div>
+
+    <div id="visitorProfileSection">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+        <div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:#636366;">Deine Kontaktdaten</div>
+        <button type="button" onclick="clearVisitorProfile()" id="clearProfileBtn" style="display:none; background:none; border:none; font-size:12px; color:#aeaeb2; cursor:pointer; font-family:inherit;">Ändern</button>
+      </div>
+
+      <div id="visitorProfilePreview" style="display:none; background:#f2f2f7; border-radius:10px; padding:10px 14px; margin-bottom:14px; font-size:14px;">
+        <strong id="profilePreviewName"></strong>
+        <div style="font-size:12px; color:#636366; margin-top:2px;" id="profilePreviewDetails"></div>
+      </div>
+
+      <div id="visitorProfileForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Vorname *</label>
+            <input id="visitorFirstName" type="text" placeholder="Hannes">
+          </div>
+          <div class="form-group">
+            <label>Nachname *</label>
+            <input id="visitorLastName" type="text" placeholder="Mustermann">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>E-Mail *</label>
+          <input id="visitorEmail" type="email" placeholder="hannes@beispiel.de">
+        </div>
+        <div class="form-group">
+          <label>Unternehmen</label>
+          <input id="visitorCompany" type="text" placeholder="Optional">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Wunschdatum</label>
+        <input id="visitDate" type="date" min="2026-04-20" max="2026-04-24">
+      </div>
+      <div class="form-group">
+        <label>Uhrzeit</label>
+        <select id="visitTime">
+          <option value="">Beliebig</option>
+          <option value="09:00">09:00</option>
+          <option value="10:00">10:00</option>
+          <option value="11:00">11:00</option>
+          <option value="12:00">12:00</option>
+          <option value="13:00">13:00</option>
+          <option value="14:00">14:00</option>
+          <option value="15:00">15:00</option>
+          <option value="16:00">16:00</option>
+          <option value="17:00">17:00</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Nachricht / Gesprächsthema</label>
+      <textarea id="visitMessage" placeholder="Worum geht es bei dem Treffen?"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeBookingModal()">Abbrechen</button>
+      <button class="btn-modal-confirm" id="confirmBookingBtn" onclick="confirmBooking()">Buchung bestätigen</button>
+    </div>
+  </div>
 </div>
 
+<!-- ══════════════════ EMAIL DRAFT MODAL ══════════════════ -->
+<div class="modal-overlay" id="emailModal">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-title">E-Mail an Aussteller senden</div>
+    <div class="modal-subtitle">Überprüfe und bearbeite die E-Mail — dann auf „Senden" klicken.</div>
+
+    <div class="form-group">
+      <label>Empfänger-E-Mail *</label>
+      <input id="emailRecipient" type="email" placeholder="contact@exhibitor.com">
+    </div>
+
+    <div class="form-group">
+      <label>Betreff</label>
+      <input id="emailSubject" type="text">
+    </div>
+
+    <div class="form-group">
+      <label>E-Mail-Text</label>
+      <textarea id="emailBody" style="min-height:200px; font-size:14px; font-family: 'SF Mono', monospace;"></textarea>
+    </div>
+
+    <div id="emailSendError" style="display:none; background:#fee2e2; border-radius:10px; padding:10px 14px; font-size:13px; color:#991b1b; margin-bottom:10px;"></div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeEmailModal()">Abbrechen</button>
+      <button class="btn-modal-confirm" id="sendEmailBtn" onclick="sendEmail()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Jetzt senden
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<div class="footer">© Hannes Hennerbichler, Fabian Hoppe</div>
+
 <script>
-  let history = [];
+  // ─────────────────────────────────────────────
+  // Config
+  // ─────────────────────────────────────────────
+  // Chat always goes to Railway (OpenAI runs there).
+  // All other endpoints (/exhibitors, /bookings, /contact) use the same origin
+  // so the app works identically on localhost and on Railway.
+  const CHAT_BASE = 'https://messe-chat-production.up.railway.app';
+  const API_BASE = '';
 
-  let recognition = null;
-let isRecording = false;
-
-function toggleMic() {
-  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-    alert('Speech recognition is not supported in this browser. Please use Chrome.');
-    return;
-  }
-
-  if (isRecording) {
-    recognition.stop();
-    return;
-  }
-
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  recognition = new SpeechRecognition();
-  recognition.lang = 'en-US';
-  recognition.continuous = false;
-  recognition.interimResults = true;
-
-  recognition.onstart = () => {
-    isRecording = true;
-    document.getElementById('mic').classList.add('recording');
-  };
-
-  recognition.onresult = (event) => {
-    const transcript = Array.from(event.results)
-      .map(r => r[0].transcript)
-      .join('');
-    document.getElementById('input').value = transcript;
-  };
-
-  recognition.onend = () => {
-    isRecording = false;
-    document.getElementById('mic').classList.remove('recording');
-    const text = document.getElementById('input').value.trim();
-    if (text) sendMessage();
-  };
-
-  recognition.onerror = (event) => {
-    isRecording = false;
-    document.getElementById('mic').classList.remove('recording');
-    console.error('Speech error:', event.error);
-  };
-
-  recognition.start();
-}
-
-async function sendMessage() {
-  const input = document.getElementById('input');
-  const text = input.value.trim();
-  if (!text) return;
-
-  addMessage(text, 'user');
-  input.value = '';
-  history.push({ role: 'user', content: text });
-
-  const loadingEl = addMessage('Thinking...', 'assistant loading');
-  document.getElementById('send').disabled = true;
-
-  try {
-    const response = await fetch('https://messe-chat-production.up.railway.app/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text, history: history.slice(0, -1) })
+  // ─────────────────────────────────────────────
+  // Tab switching
+  // ─────────────────────────────────────────────
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      const ids = ['chat', 'map', 'bookings'];
+      t.classList.toggle('active', ids[i] === name);
     });
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(`panel-${name}`).classList.add('active');
 
-    const data = await response.json();
-    const reply = data.reply;
+    if (name === 'bookings') loadBookings();
+  }
 
-    if (reply) {
-      loadingEl.textContent = reply;
-      loadingEl.classList.remove('loading');
-      history.push({ role: 'assistant', content: reply });
-    } else {
-      loadingEl.textContent = 'No response received.';
+  // ─────────────────────────────────────────────
+  // CHAT
+  // ─────────────────────────────────────────────
+  let history = [];
+  let recognition = null;
+  let isRecording = false;
+
+  function toggleMic() {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('Spracheingabe wird in diesem Browser nicht unterstützt. Bitte Chrome verwenden.');
+      return;
+    }
+    if (isRecording) { recognition.stop(); return; }
+
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SR();
+    recognition.lang = 'de-DE';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    recognition.onstart = () => {
+      isRecording = true;
+      document.getElementById('mic').classList.add('recording');
+    };
+    recognition.onresult = e => {
+      const t = Array.from(e.results).map(r => r[0].transcript).join('');
+      document.getElementById('input').value = t;
+    };
+    recognition.onend = () => {
+      isRecording = false;
+      document.getElementById('mic').classList.remove('recording');
+      const t = document.getElementById('input').value.trim();
+      if (t) sendMessage();
+    };
+    recognition.onerror = e => {
+      isRecording = false;
+      document.getElementById('mic').classList.remove('recording');
+      console.error('Speech error:', e.error);
+    };
+    recognition.start();
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById('input');
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage(text, 'user');
+    input.value = '';
+    history.push({ role: 'user', content: text });
+
+    const loadingEl = addMessage('Denke nach…', 'assistant loading');
+    document.getElementById('send').disabled = true;
+
+    try {
+      const response = await fetch(`${CHAT_BASE}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, history: history.slice(0, -1) })
+      });
+
+      const data = await response.json();
+      const reply = data.reply;
+
+      if (reply) {
+        loadingEl.textContent = reply;
+        loadingEl.classList.remove('loading');
+        history.push({ role: 'assistant', content: reply });
+      } else {
+        loadingEl.textContent = 'Keine Antwort erhalten.';
+        loadingEl.classList.remove('loading');
+        history.pop();
+      }
+    } catch (err) {
+      loadingEl.textContent = 'Verbindungsfehler zum Server.';
       loadingEl.classList.remove('loading');
       history.pop();
     }
 
-  } catch (err) {
-    loadingEl.textContent = 'Error connecting to server.';
-    loadingEl.classList.remove('loading');
-    history.pop();
+    document.getElementById('send').disabled = false;
   }
-
-  document.getElementById('send').disabled = false;
-}
 
   function addMessage(text, cls) {
     const chat = document.getElementById('chat');
@@ -427,14 +1306,567 @@ async function sendMessage() {
   }
 
   function ask(question) {
+    switchTab('chat');
     document.getElementById('input').value = question;
     sendMessage();
   }
-</script>
 
-<div style="text-align: center; padding: 12px; font-size: 12px; color: #aeaeb2; background: white;">
-  © Hannes Hennerbichler, Fabian Hoppe
-</div>
+  // ─────────────────────────────────────────────
+  // MAP
+  // ─────────────────────────────────────────────
+  let mapSearchTimer = null;
+
+  function debouncedMapSearch() {
+    clearTimeout(mapSearchTimer);
+    mapSearchTimer = setTimeout(doMapSearch, 350);
+  }
+
+  async function doMapSearch() {
+    const q = document.getElementById('mapSearch').value.trim();
+    if (!q) {
+      document.getElementById('mapResultList').style.display = 'none';
+      clearHallHighlights();
+      return;
+    }
+
+    // Check if it's a hall number search
+    const hallMatch = q.match(/halle?\s*(\d+)/i);
+    if (hallMatch) {
+      const hallNum = parseInt(hallMatch[1], 10);
+      highlightHall(hallNum);
+      await fetchExhibitorsByHall(hallNum);
+      return;
+    }
+
+    // Otherwise search by name
+    try {
+      const res = await fetch(`${API_BASE}/exhibitors?q=${encodeURIComponent(q)}&limit=20`);
+      const data = await res.json();
+      showMapResults(data.results || [], `"${q}" — ${data.total || 0} Ergebnisse`);
+
+      // Highlight halls from results
+      clearHallHighlights();
+      const halls = new Set();
+      (data.results || []).forEach(e => {
+        const m = e.booth?.match(/Hall\s*(\d+)/i);
+        if (m) halls.add(parseInt(m[1], 10));
+      });
+      halls.forEach(h => highlightHall(h, false));
+    } catch (e) {
+      console.error('Map search error:', e);
+    }
+  }
+
+  async function fetchExhibitorsByHall(hallNum) {
+    try {
+      const res = await fetch(`${API_BASE}/exhibitors?hall=${hallNum}&limit=20`);
+      const data = await res.json();
+      showMapResults(data.results || [], `Halle ${hallNum} — ${data.total || 0} Aussteller`);
+    } catch (e) {
+      console.error('Hall fetch error:', e);
+    }
+  }
+
+  function showMapResults(items, title) {
+    const list = document.getElementById('mapResultList');
+    const titleEl = document.getElementById('mapResultTitle');
+    const itemsEl = document.getElementById('mapResultItems');
+
+    titleEl.textContent = title;
+    itemsEl.innerHTML = '';
+
+    if (!items.length) {
+      itemsEl.innerHTML = '<div style="padding:16px; color:#636366; font-size:14px;">Keine Aussteller gefunden.</div>';
+    } else {
+      items.forEach(e => {
+        const div = document.createElement('div');
+        div.className = 'map-result-item';
+        div.innerHTML = `
+          <div>
+            <div class="map-result-name">${escHtml(e.name)}</div>
+            <div class="map-result-meta">${escHtml(e.booth || '')} · ${escHtml(e.country || '')}</div>
+          </div>
+          <div class="map-result-actions">
+            ${e.url ? `<a href="${escHtml(e.url)}" target="_blank" class="btn-small">Profil ↗</a>` : ''}
+            <button class="btn-small primary" onclick='openBookingModalFor(${JSON.stringify({name: e.name, booth: e.booth, directLinkId: e.directLinkId || ""})})'>Buchen</button>
+          </div>`;
+        itemsEl.appendChild(div);
+      });
+    }
+
+    list.style.display = 'block';
+  }
+
+  function highlightHall(hallNum, clearFirst = true) {
+    if (clearFirst) clearHallHighlights();
+    const el = document.getElementById(`hall-${hallNum}`);
+    if (el) {
+      el.classList.add('highlighted');
+      el.querySelector('rect').style.stroke = '#ff9500';
+      el.querySelector('rect').style.strokeWidth = '3';
+      el.querySelector('rect').style.fillOpacity = '0.35';
+    }
+  }
+
+  function clearHallHighlights() {
+    document.querySelectorAll('.hall-box').forEach(el => {
+      el.classList.remove('highlighted');
+      const rect = el.querySelector('rect');
+      if (rect) {
+        rect.style.stroke = '';
+        rect.style.strokeWidth = '';
+        rect.style.fillOpacity = '';
+      }
+    });
+  }
+
+  // ─────────────────────────────────────────────
+  // BOOKINGS
+  // ─────────────────────────────────────────────
+  async function loadBookings() {
+    const list = document.getElementById('bookingsList');
+    list.innerHTML = '<div style="padding:24px; color:#aeaeb2; font-size:14px;">Lade …</div>';
+    try {
+      const res = await fetch(`${API_BASE}/bookings`);
+      const bookings = await res.json();
+      renderBookings(bookings);
+    } catch (e) {
+      list.innerHTML = '<div style="padding:24px; color:#ff3b30; font-size:14px;">Fehler beim Laden der Buchungen.</div>';
+    }
+  }
+
+  const STATUS_CONFIG = {
+    draft:      { label: 'Entwurf',          cls: 'badge-draft',      icon: '✏️' },
+    email_sent: { label: 'E-Mail gesendet',  cls: 'badge-email_sent', icon: '📨' },
+    confirmed:  { label: 'Termin bestätigt', cls: 'badge-confirmed',  icon: '✓' },
+    declined:   { label: 'Abgelehnt',        cls: 'badge-declined',   icon: '✗' },
+    uncertain:  { label: 'Unklar',           cls: 'badge-uncertain',  icon: '?' },
+  };
+
+  function buildBookingCard(b) {
+    const div = document.createElement('div');
+    div.className = 'booking-card';
+    div.id = `booking-${b.id}`;
+
+    const date = b.visitor.preferredDate
+      ? new Date(b.visitor.preferredDate).toLocaleDateString('de-DE', {weekday:'short', day:'numeric', month:'long', year:'numeric'})
+      : '';
+    const time = b.visitor.preferredTime || '';
+    const when = [date, time].filter(Boolean).join(' · ');
+
+    const sc = STATUS_CONFIG[b.status] || STATUS_CONFIG.draft;
+
+    // Action button depending on status
+    let actionBtn = '';
+    if (b.status === 'draft') {
+      actionBtn = `<button class="btn-small primary" onclick="openEmailModal('${b.id}')">✉️ E-Mail ansehen & senden</button>`;
+    } else if (b.status === 'email_sent') {
+      actionBtn = `<div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#636366;">
+        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#3b82f6;animation:pulse-dot 1.5s infinite;flex-shrink:0;"></span>
+        Warte auf Antwort — wird automatisch erkannt
+      </div>`;
+    }
+
+    // Reply analysis result
+    const replyBlock = (b.replyAnalysis && b.replyText)
+      ? `<div class="booking-detail" style="flex-basis:100%; margin-top:4px; padding:10px 12px; background:#f9f9f9; border-radius:10px; border-left:3px solid ${b.status==='confirmed'?'#10b981':b.status==='declined'?'#ef4444':'#f59e0b'}">
+           <strong style="display:inline;">KI-Analyse:</strong> ${escHtml(b.replyAnalysis)}
+         </div>`
+      : '';
+
+    div.innerHTML = `
+      <div class="booking-card-top">
+        <div>
+          <div class="booking-exhibitor">${escHtml(b.exhibitor.name)}</div>
+          <div class="booking-booth">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#636366" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            ${escHtml(b.exhibitor.booth || '—')}
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+          <span class="booking-badge ${sc.cls}">${sc.icon} ${sc.label}</span>
+          <button class="btn-cancel" onclick="cancelBooking('${b.id}')">Stornieren</button>
+        </div>
+      </div>
+      ${actionBtn ? `<div style="margin-top:12px;">${actionBtn}</div>` : ''}
+      <div class="booking-detail-row">
+        <div class="booking-detail">
+          <strong>${escHtml(b.visitor.name)}</strong>
+          Besucher
+        </div>
+        ${b.visitor.company ? `<div class="booking-detail"><strong>${escHtml(b.visitor.company)}</strong>Unternehmen</div>` : ''}
+        ${when ? `<div class="booking-detail"><strong>${escHtml(when)}</strong>Wunschtermin</div>` : ''}
+        ${b.visitor.message ? `<div class="booking-detail" style="flex-basis:100%;"><strong style="display:inline;">Thema:</strong> ${escHtml(b.visitor.message)}</div>` : ''}
+        ${replyBlock}
+      </div>
+    `;
+    return div;
+  }
+
+  async function cancelBooking(id) {
+    if (!confirm('Buchung wirklich stornieren?')) return;
+    try {
+      await fetch(`${API_BASE}/bookings/${id}`, { method: 'DELETE' });
+      document.getElementById(`booking-${id}`)?.remove();
+      // Re-check if empty
+      const list = document.getElementById('bookingsList');
+      if (!list.children.length) loadBookings();
+    } catch (e) {
+      alert('Fehler beim Stornieren. Bitte erneut versuchen.');
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // BOOKING MODAL
+  // ─────────────────────────────────────────────
+  let exSearchTimer = null;
+
+  // ─────────────────────────────────────────────
+  // Visitor profile (localStorage)
+  // ─────────────────────────────────────────────
+  function loadVisitorProfile() {
+    try { return JSON.parse(localStorage.getItem('messeVisitorProfile') || 'null'); } catch { return null; }
+  }
+
+  function saveVisitorProfile(profile) {
+    localStorage.setItem('messeVisitorProfile', JSON.stringify(profile));
+  }
+
+  function applyVisitorProfile() {
+    const p = loadVisitorProfile();
+    const formEl    = document.getElementById('visitorProfileForm');
+    const previewEl = document.getElementById('visitorProfilePreview');
+    const clearBtn  = document.getElementById('clearProfileBtn');
+
+    if (p) {
+      // Show compact preview, hide form
+      document.getElementById('profilePreviewName').textContent = `${p.firstName} ${p.lastName}`;
+      document.getElementById('profilePreviewDetails').textContent =
+        [p.company, p.email].filter(Boolean).join(' · ');
+      previewEl.style.display = 'block';
+      formEl.style.display = 'none';
+      clearBtn.style.display = 'inline';
+
+      // Still fill hidden fields so confirmBooking() can read them
+      document.getElementById('visitorFirstName').value = p.firstName;
+      document.getElementById('visitorLastName').value  = p.lastName;
+      document.getElementById('visitorEmail').value     = p.email;
+      document.getElementById('visitorCompany').value   = p.company || '';
+    } else {
+      previewEl.style.display = 'none';
+      formEl.style.display = 'block';
+      clearBtn.style.display = 'none';
+    }
+  }
+
+  function clearVisitorProfile() {
+    localStorage.removeItem('messeVisitorProfile');
+    document.getElementById('visitorFirstName').value = '';
+    document.getElementById('visitorLastName').value  = '';
+    document.getElementById('visitorEmail').value     = '';
+    document.getElementById('visitorCompany').value   = '';
+    document.getElementById('visitorProfilePreview').style.display = 'none';
+    document.getElementById('visitorProfileForm').style.display = 'block';
+    document.getElementById('clearProfileBtn').style.display = 'none';
+  }
+
+  function openBookingModal(exhibitorData) {
+    clearBookingForm();
+    applyVisitorProfile();
+    if (exhibitorData) prefillExhibitor(exhibitorData);
+    document.getElementById('bookingModal').classList.add('open');
+  }
+
+  function openBookingModalFor(exhibitorData) {
+    openBookingModal(exhibitorData);
+  }
+
+  function closeBookingModal() {
+    document.getElementById('bookingModal').classList.remove('open');
+  }
+
+  function clearBookingForm() {
+    ['exhibitorSearchInput','selectedExhibitorName','selectedExhibitorBooth','selectedExhibitorDirectLinkId',
+     'visitorFirstName','visitorLastName','visitorEmail','visitorCompany','visitMessage'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('visitDate').value = '';
+    document.getElementById('visitTime').value = '';
+    document.getElementById('exhibitorDropdown').innerHTML = '';
+    document.getElementById('exhibitorDropdown').classList.remove('open');
+    document.getElementById('selectedExhibitorPreview').style.display = 'none';
+  }
+
+  function prefillExhibitor(e) {
+    document.getElementById('exhibitorSearchInput').value = e.name;
+    document.getElementById('selectedExhibitorName').value = e.name;
+    document.getElementById('selectedExhibitorBooth').value = e.booth || '';
+    document.getElementById('selectedExhibitorDirectLinkId').value = e.directLinkId || '';
+    document.getElementById('previewName').textContent = e.name;
+    document.getElementById('previewBooth').textContent = e.booth || '';
+    document.getElementById('selectedExhibitorPreview').style.display = 'block';
+  }
+
+  function searchExhibitorsDebounced() {
+    clearTimeout(exSearchTimer);
+    exSearchTimer = setTimeout(searchExhibitors, 300);
+  }
+
+  async function searchExhibitors() {
+    const q = document.getElementById('exhibitorSearchInput').value.trim();
+    if (q.length < 2) {
+      document.getElementById('exhibitorDropdown').classList.remove('open');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/exhibitors?q=${encodeURIComponent(q)}&limit=10`);
+      const data = await res.json();
+      const dropdown = document.getElementById('exhibitorDropdown');
+      dropdown.innerHTML = '';
+
+      if (!data.results?.length) {
+        dropdown.innerHTML = '<div class="dropdown-item" style="color:#636366;">Keine Ergebnisse</div>';
+      } else {
+        data.results.forEach(e => {
+          const item = document.createElement('div');
+          item.className = 'dropdown-item';
+          item.innerHTML = `${escHtml(e.name)}<small>${escHtml(e.booth || '')} · ${escHtml(e.country || '')}</small>`;
+          item.onclick = () => selectExhibitor(e);
+          dropdown.appendChild(item);
+        });
+      }
+
+      dropdown.classList.add('open');
+    } catch (err) {
+      console.error('Exhibitor search error:', err);
+    }
+  }
+
+  function selectExhibitor(e) {
+    document.getElementById('exhibitorSearchInput').value = e.name;
+    document.getElementById('selectedExhibitorName').value = e.name;
+    document.getElementById('selectedExhibitorBooth').value = e.booth || '';
+    document.getElementById('selectedExhibitorDirectLinkId').value = e.directLinkId || '';
+    document.getElementById('previewName').textContent = e.name;
+    document.getElementById('previewBooth').textContent = e.booth || '';
+    document.getElementById('selectedExhibitorPreview').style.display = 'block';
+    document.getElementById('exhibitorDropdown').classList.remove('open');
+  }
+
+  async function confirmBooking() {
+    const name = document.getElementById('selectedExhibitorName').value.trim();
+    const booth = document.getElementById('selectedExhibitorBooth').value.trim();
+    const directLinkId = document.getElementById('selectedExhibitorDirectLinkId').value.trim();
+    const firstName = document.getElementById('visitorFirstName').value.trim();
+    const lastName = document.getElementById('visitorLastName').value.trim();
+    const email = document.getElementById('visitorEmail').value.trim();
+    const company = document.getElementById('visitorCompany').value.trim();
+    const date = document.getElementById('visitDate').value;
+    const time = document.getElementById('visitTime').value;
+    const message = document.getElementById('visitMessage').value.trim();
+
+    if (!name) { alert('Bitte wähle einen Aussteller aus.'); return; }
+    if (!firstName || !lastName) { alert('Bitte gib deinen Vor- und Nachnamen ein.'); return; }
+    if (!email || !email.includes('@')) { alert('Bitte gib eine gültige E-Mail-Adresse ein.'); return; }
+
+    const btn = document.getElementById('confirmBookingBtn');
+    btn.disabled = true;
+    btn.textContent = 'Wird gespeichert …';
+
+    try {
+      const res = await fetch(`${API_BASE}/bookings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          exhibitor: { name, booth, directLinkId },
+          visitor: {
+            name: `${firstName} ${lastName}`,
+            email,
+            company,
+            preferredDate: date,
+            preferredTime: time,
+            message
+          }
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        saveVisitorProfile({ firstName, lastName, email, company });
+        closeBookingModal();
+        switchTab('bookings');
+        loadBookings();
+      } else {
+        alert('Fehler: ' + (data.error || 'Unbekannter Fehler'));
+      }
+    } catch (e) {
+      alert('Verbindungsfehler. Bitte erneut versuchen.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Buchung bestätigen';
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // EMAIL MODAL
+  // ─────────────────────────────────────────────
+  let currentEmailBookingId = null;
+
+  async function openEmailModal(bookingId) {
+    currentEmailBookingId = bookingId;
+    document.getElementById('emailRecipient').value = '';
+    document.getElementById('emailSubject').value = '';
+    document.getElementById('emailBody').value = '';
+    document.getElementById('emailSendError').style.display = 'none';
+
+    try {
+      const res = await fetch(`${API_BASE}/bookings/${bookingId}/email-draft`);
+      const data = await res.json();
+      document.getElementById('emailSubject').value = data.subject || '';
+      document.getElementById('emailBody').value = data.body || '';
+    } catch (e) {
+      console.error('Could not load draft:', e);
+    }
+
+    document.getElementById('emailModal').classList.add('open');
+    document.getElementById('emailRecipient').focus();
+  }
+
+  function closeEmailModal() {
+    document.getElementById('emailModal').classList.remove('open');
+    currentEmailBookingId = null;
+  }
+
+  async function sendEmail() {
+    const recipient = document.getElementById('emailRecipient').value.trim();
+    const subject   = document.getElementById('emailSubject').value.trim();
+    const body      = document.getElementById('emailBody').value.trim();
+    const errEl     = document.getElementById('emailSendError');
+
+    if (!recipient || !recipient.includes('@')) {
+      errEl.textContent = 'Bitte eine gültige Empfänger-E-Mail eingeben.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (!subject || !body) {
+      errEl.textContent = 'Betreff und E-Mail-Text dürfen nicht leer sein.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    errEl.style.display = 'none';
+    const btn = document.getElementById('sendEmailBtn');
+    btn.disabled = true;
+    btn.textContent = 'Wird gesendet …';
+
+    try {
+      const res = await fetch(`${API_BASE}/bookings/${currentEmailBookingId}/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipientEmail: recipient, subject, body })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        closeEmailModal();
+        loadBookings();
+      } else {
+        errEl.textContent = data.error || 'Unbekannter Fehler beim Senden.';
+        errEl.style.display = 'block';
+      }
+    } catch (e) {
+      errEl.textContent = 'Verbindungsfehler. Ist der Server gestartet?';
+      errEl.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Jetzt senden';
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // Auto-refresh bookings every 30s when tab is active
+  // ─────────────────────────────────────────────
+  let autoRefreshInterval = null;
+  let lastBookingStatuses = {};
+
+  function startAutoRefresh() {
+    if (autoRefreshInterval) return;
+    autoRefreshInterval = setInterval(async () => {
+      // Only refresh if bookings tab is active
+      if (!document.getElementById('panel-bookings').classList.contains('active')) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/bookings`);
+        const bookings = await res.json();
+
+        // Check if any status changed
+        let changed = false;
+        bookings.forEach(b => {
+          if (lastBookingStatuses[b.id] !== b.status) {
+            changed = true;
+            lastBookingStatuses[b.id] = b.status;
+          }
+        });
+
+        if (changed) renderBookings(bookings);
+      } catch (e) {}
+    }, 30 * 1000);
+  }
+
+  startAutoRefresh();
+
+  function renderBookings(bookings) {
+    const list = document.getElementById('bookingsList');
+    if (!bookings.length) {
+      list.innerHTML = `
+        <div class="bookings-empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1c1c1e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <p>Noch keine Buchungen</p>
+          <span>Leg deinen ersten Standbesuch an — klick oben auf „Buchung anlegen".</span>
+        </div>`;
+      return;
+    }
+    list.innerHTML = '';
+    bookings.slice().reverse().forEach(b => {
+      lastBookingStatuses[b.id] = b.status;
+      list.appendChild(buildBookingCard(b));
+    });
+  }
+
+  // Close modals on overlay click
+  document.getElementById('bookingModal').addEventListener('click', function(e) {
+    if (e.target === this) closeBookingModal();
+  });
+  document.getElementById('emailModal').addEventListener('click', function(e) {
+    if (e.target === this) closeEmailModal();
+  });
+
+  // Close exhibitor dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    const dd = document.getElementById('exhibitorDropdown');
+    if (!dd.contains(e.target) && e.target.id !== 'exhibitorSearchInput') {
+      dd.classList.remove('open');
+    }
+  });
+
+  // ─────────────────────────────────────────────
+  // Utilities
+  // ─────────────────────────────────────────────
+  function escHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+</script>
 
 </body>
 </html>
